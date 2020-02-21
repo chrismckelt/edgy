@@ -1,0 +1,308 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "${CONTAINER_REGISTRY_USERNAME}": {
+                "username": "${CONTAINER_REGISTRY_USERNAME}",
+                "password": "${CONTAINER_REGISTRY_PASSWORD}",
+                "address": "${CONTAINER_REGISTRY_SERVER}"
+              },
+              "docker": {
+                "address": "docker.io",
+                "username": "${CONTAINER_DOCKER_USERNAME}",
+                "password": "${CONTAINER_DOCKER_PASSWORD}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.5",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ]
+                }
+              }
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "PortBindings": {
+                    "5671/tcp": [{
+                      "HostPort": "5671"
+                    }],
+                    "8883/tcp": [{
+                      "HostPort": "8883"
+                    }],
+                    "443/tcp": [{
+                      "HostPort": "443"
+                    }]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "WebApp": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.WebApp.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8089/tcp",
+                  "Env": [
+                    "LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}",
+                    "LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}"
+                  ],
+                  "PortBindings": {
+                    "8089/tcp": [{
+                      "HostPort": "8089"
+                    }]
+                  }
+                }
+              }
+            }
+          },
+          "TimescaleDB": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.TimescaleDb.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "ExposedPorts": "5432/tcp",
+                  "PortBindings": {
+                    "5432/tcp": [{
+                      "HostPort": "8081"
+                    }]
+                  }
+                }
+              }
+            }
+          },
+          "PythonDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.PythonDataGenerator.debug}",
+              "createOptions": {}
+            }
+          },
+          "PythonDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.PythonDataRecorder.debug}",
+              "createOptions": {}
+            }
+          },
+          "NodeDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.NodeDataRecorder.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "9089/tcp",
+                  "PortBindings": {
+                    "8086/tcp": [
+                      {
+                        "HostPort": "9089"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "NodeDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.NodeDataGenerator.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8086/tcp",
+                  "PortBindings": {
+                    "8086/tcp": [
+                      {
+                        "HostPort": "8086"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "DotNetDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.DotNetDataGenerator.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8085/tcp",
+                  "PortBindings": {
+                    "443/tcp": [
+                      {
+                        "HostPort": "8085"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "DotNetDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.DotNetDataRecorder.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ]
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "Nifi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.Nifi.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8080/tcp",
+                  "PortBindings": {
+                    "8080/tcp": [
+                      {
+                        "HostPort": "8080"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME}"
+              },
+              "NIFI_WEB_HTTP_PORT": {
+                "value": "8080"
+              }
+            }
+          }
+        
+        }
+      
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "AllToUpstream": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO $upstream",
+          "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/DotNetDataRecorder/inputs/input1\")",
+          "DotNetDataGeneratorToWebApp": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "DotNetDataGeneratorTNifi": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")"
+
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}

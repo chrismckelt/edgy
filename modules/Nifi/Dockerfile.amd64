@@ -1,0 +1,62 @@
+#FROM apache/nifi
+#FROM node:8-alpine
+#FROM iaazeedgexcontainerstore.azurecr.io/south32/nifi:latest
+
+# add Java & Apache Nifi
+#RUN apk update && apk upgrade 
+#RUN apk add --no-cache openjdk8
+#RUN apk add wget 
+#RUN wget http://apache.redkiwi.nl/nifi/1.10.0/nifi-1.10.0-bin.tar.gz 
+#RUN tar zxvf nifi-1.10.0-bin.tar.gz
+#RUN rm nifi-1.10.0-bin.tar.gz
+#
+#RUN apk update
+#RUN apk add --update nodejs nodejs-npm
+#RUN npm add npm -g
+
+#WORKDIR /module
+
+#COPY package*.json ./
+
+#RUN npm install --production
+
+#EXPOSE 8080/tcp
+
+#COPY app.js ./
+#CMD ["node", "--inspect=0.0.0.0:9229", "app.js"]
+
+#  NON ALPINE IMAGE 
+FROM ubuntu:bionic
+
+#USER root
+
+WORKDIR /
+
+# Install Java & Apache Nifi
+RUN apt-get update && apt-get upgrade -y
+RUN apt-get install openjdk-8-jdk -y
+RUN apt-get install wget -y
+RUN wget http://apache.redkiwi.nl/nifi/1.10.0/nifi-1.10.0-bin.tar.gz 
+RUN tar zxvf nifi-1.10.0-bin.tar.gz
+RUN rm nifi-1.10.0-bin.tar.gz
+
+WORKDIR /module
+
+COPY package*.json ./
+
+RUN apt-get update; \
+    apt-get install -y curl gnupg; \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash -; \
+    apt-get install -y nodejs; \
+    rm -rf /var/lib/apt/lists/*
+
+#RUN apt-get install nodejs npm -y --fix-missing
+RUN npm install npm -g
+RUN npm install --production
+
+EXPOSE 8080/tcp
+
+COPY app.js ./
+
+#CMD ["node", "app.js"]
+CMD ["node", "--inspect=0.0.0.0:9229", "app.js"]

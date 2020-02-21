@@ -1,0 +1,324 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "${CONTAINER_REGISTRY_USERNAME}": {
+                "username": "${CONTAINER_REGISTRY_USERNAME}",
+                "password": "${CONTAINER_REGISTRY_PASSWORD}",
+                "address": "${CONTAINER_REGISTRY_SERVER}"
+              },
+              "docker": {
+                "address": "docker.io",
+                "username": "${CONTAINER_DOCKER_USERNAME}",
+                "password": "${CONTAINER_DOCKER_PASSWORD}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.5",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/config:/config\"]}}"
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/config:/config\"],\"PortBindings\":{\"5671/tcp\":[{\"HostPort\":\"5671\"}],\"8883/tcp\":[{\"HostPort\":\"8883\"}],\"443/tcp\":[{\"HostPort\":\"443\"}]}}}"
+            }
+          }
+        },
+        "modules": {
+          "Portainer": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/portainer:latest",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/var/run/docker.sock:/var/run/docker.sock",
+                    "portainer_data:/data"
+                  ],
+                  "ExposedPorts": "9000/tcp",
+                  "Env": [
+                    "LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}",
+                    "LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}"
+                  ],
+                  "PortBindings": {
+                    "9000/tcp": [
+                      {
+                        "HostPort": "9000"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+            
+          },
+          "DotNetDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/dotnetdatagenerator:latest",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/config:/config"
+                  ],
+                  "ExposedPorts": "8087/tcp",
+                  "Env": [
+                  
+                    "LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}",
+                    "LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}",
+                    "EdgeHubConnectionString=HostName=auaze-edgex-dev.azure-devices.net;DeviceId=CloudDevice;SharedAccessKey=laoaE3QHAtZfhDevyRl72j2vr4RgVu6GAldoHVJtA5M=;ModuleId=DotNetDataRecorder:GatewayHostName=auazexedgexxdev"
+                  ],
+                  "PortBindings": {
+                    "443/tcp": [
+                      {
+                        "HostPort": "8087"
+                      }
+                    ]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              },
+              "EdgeHubConnectionString":{
+                "value": "HostName=auaze-edgex-dev.azure-devices.net;DeviceId=CloudDevice;SharedAccessKey=laoaE3QHAtZfhDevyRl72j2vr4RgVu6GAldoHVJtA5M=;ModuleId=PythonDataRecorder:GatewayHostName=auazexedgexxdev"
+              }
+            }
+          },
+          "DotNetDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/dotnetdatarecorder:latest",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/config:/config"
+                  ]
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              },
+              "EdgeHubConnectionString":{
+                "value": "HostName=auaze-edgex-dev.azure-devices.net;DeviceId=CloudDevice;SharedAccessKey=laoaE3QHAtZfhDevyRl72j2vr4RgVu6GAldoHVJtA5M=;ModuleId=DotNetDataRecorder:GatewayHostName=auazexedgexxdev"
+              }
+            }
+          },
+          "WebApp": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/webapp:latest",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/config:/config"
+                  ],
+                  "ExposedPorts": "8089/tcp",
+                  "PortBindings": {
+                    "8089/tcp": [
+                      {
+                        "HostPort": "8089"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+
+
+    
+          },
+          "TimescaleDB": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/timescaledb:latest",
+              "createOptions": "{\"HostConfig\":{\"ExposedPorts\":\"5432/tcp\",\"PortBindings\":{\"5432/tcp\":[{\"HostPort\":\"8081\"}]}}}"
+            }
+          },
+          "Nifi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/nifi:latest",
+              "createOptions": "{\"HostConfig\":{\"Binds\":[\"/config:/config\"],\"ExposedPorts\":\"8080/tcp\",\"Env\":[\"NIFI_WEB_HTTP_PORT=8080\",\"LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}\",\"LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}\"],\"PortBindings\":{\"8080/tcp\":[{\"HostPort\":\"8080\"}]}}}"
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME}"
+              },
+              "NIFI_WEB_HTTP_PORT": {
+                "value": "8080"
+              }
+            }
+          },
+          "BlobStorage": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azure-blob-storage:latest",
+              "createOptions": "{  \"Env\":[    \"LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}\",    \"LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}\"  ],  \"HostConfig\":{    \"Binds\":[        \"/config:/config\"    ],    \"PortBindings\":{      \"11002/tcp\":[{\"HostPort\":\"11002\"}]    }  }}"
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "Grafana": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/grafana:latest",
+              "createOptions": "{\"HostConfig\":{\"ExposedPorts\":\"3000/tcp\",\"PortBindings\":{\"3000/tcp\":[{\"HostPort\":\"8082\"}]},\"Link\":\"timescaledb\"}}"
+            }
+          },
+          "PythonDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/pythondatarecorder:latest",
+              "createOptions": {
+                
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              },
+              "EdgeHubConnectionString":{
+                "value": "HostName=auaze-edgex-dev.azure-devices.net;DeviceId=CloudDevice;SharedAccessKey=laoaE3QHAtZfhDevyRl72j2vr4RgVu6GAldoHVJtA5M=;ModuleId=PythonDataRecorder:GatewayHostName=auazexedgexxdev"
+              }
+            }
+          },
+          "NodeDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/nodedatagenerator:latest",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "/config:/config"
+                  ],
+                  "ExposedPorts": "8086/tcp",
+                  "PortBindings": {
+                    "8086/tcp": [
+                      {
+                        "HostPort": "8086"
+                      }
+                    ]
+                  }
+                }
+              } 
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              },
+              "ASPNETCORE_ENVIRONMENT": {
+                "value": "Development"
+              },
+              "ASPNETCORE_URLS": {
+                "value": "https://+;http://+"
+              },
+              "ASPNETCORE_Kestrel__Certificates__Default__Password": {
+                "value": "1234"
+              },
+              "ASPNETCORE_Kestrel__Certificates__Default__Path": {
+                "value": "/config/certs/new-edge-device.cert.pem"
+              },
+              "EdgeHubConnectionString":{
+                "value": "HostName=auaze-edgex-dev.azure-devices.net;DeviceId=CloudDevice;SharedAccessKey=laoaE3QHAtZfhDevyRl72j2vr4RgVu6GAldoHVJtA5M=;ModuleId=NodeDataGenerator:GatewayHostName=auazexedgexxdev"
+              }
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/DotNetDataRecorder/inputs/input1\")",
+          "DotNetDataGeneratorToWebApp": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "DotNetDataGeneratorPython": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/PythonDataRecorder/inputs/input1\")"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    },
+    "Nifi": {
+      "properties.desired": {
+        "certificatefile": "azure-iot-test-only.root.ca.cert.pem",
+        "flowversion": "",
+        "accountname": "${LOCAL_ACCOUNT_NAME}",
+        "accountkey": "${LOCAL_ACCOUNT_KEY}",
+        "containername": "certs"
+      }
+    }
+  }
+}

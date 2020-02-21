@@ -1,0 +1,1 @@
+docker build  --rm -f "/modules/DotNetDataGenerator/Dockerfile.amd64.debug" -t "dotnetdatagenerator:latest" "/modules/DotNetDataGenerator" 

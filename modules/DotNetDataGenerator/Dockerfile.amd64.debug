@@ -1,0 +1,38 @@
+FROM mcr.microsoft.com/dotnet/core/runtime:2.1-stretch-slim AS base
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends unzip procps && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN apt-get install ca-certificates && rm -rf /var/cache/apt/*
+RUN update-ca-certificates
+
+ENV EdgeModuleCACertificateFile=/config/certs/new-edge-device.cert.pem
+#ENV EdgeHubConnectionString=
+ENV ASPNETCORE_ENVIRONMENT=Development
+ENV CreateFromConnectionString=
+
+# RUN useradd -ms /bin/bash moduleuser
+# USER moduleuser
+RUN curl -sSL https://aka.ms/getvsdbgsh | bash /dev/stdin -v latest -l ~/vsdbg
+
+
+FROM mcr.microsoft.com/dotnet/core/sdk:2.1 AS build-env
+WORKDIR /app
+
+COPY *.csproj ./
+RUN dotnet restore
+RUN dotnet tool install --global dotnet-dev-certs --version 2.1.0
+#RUN dotnet dev-certs https --clean
+#RUN dotnet dev-certs https --trust
+
+COPY . ./
+RUN dotnet publish -c Debug -o out
+
+FROM base
+WORKDIR /app
+COPY --from=build-env /app/out ./
+
+ENV ASPNETCORE_ENVIRONMENT Development
+
+ENTRYPOINT ["dotnet", "DotNetDataGenerator.dll"]

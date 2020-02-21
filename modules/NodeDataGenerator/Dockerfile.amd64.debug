@@ -1,0 +1,20 @@
+FROM node:8-alpine
+
+RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
+##COPY ./copy /usr/local/share/ca-certificates/mycert.crt
+RUN update-ca-certificates
+
+WORKDIR /app/
+
+COPY package*.json ./
+
+RUN npm install chance
+RUN npm install --production
+
+COPY app.js ./
+
+EXPOSE 8086
+
+USER node
+
+CMD ["node", "--inspect=0.0.0.0:8086", "app.js"]

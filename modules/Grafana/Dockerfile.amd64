@@ -1,0 +1,5 @@
+FROM grafana/grafana:latest
+ENV GF_SECURITY_ADMIN_PASSWORD nb5PoBTg9B2iQ1OH4dMTii4fDVH2bIsVbOx4HA5U
+ENV GF_AUTH_LDAP_ENABLED=true
+COPY ldap.toml /etc/grafana/
+COPY custom.ini /etc/grafana/

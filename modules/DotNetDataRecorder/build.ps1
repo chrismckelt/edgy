@@ -1,0 +1,1 @@
+docker build  --rm -f "/modules/DotNetDataRecorder/Dockerfile.amd64.debug" -t "dotnetdatarecorder:latest" "/modules/DotNetDataRecorder" 
