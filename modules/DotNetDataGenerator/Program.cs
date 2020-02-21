@@ -95,21 +95,14 @@ namespace DotNetDataGenerator
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
-            if (!string.IsNullOrEmpty(connection) && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CreateFromConnectionString") ))
-            {
-                Log.Information($"CreateFromConnectionString ${connection}");
-                ioTHubModuleClient = ModuleClient.CreateFromConnectionString(connection);
-            }
-            else
-            {
-                var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            //if (!string.IsNullOrEmpty(connection))
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
                 //connectionSettings.CleanSession = true;
                 //connectionSettings.ValidateServerCertificate = ValidateServerCertificate;
                 connectionSettings.RemoteCertificateValidationCallback = ValidateServerCertificate;
                 ITransportSettings[] settings = { connectionSettings };
                 Log.Information($"CreateFromEnvironmentAsync");
                 ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync();
-            }
 
             try{
                 await ioTHubModuleClient.OpenAsync();
