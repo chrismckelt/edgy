@@ -85,13 +85,6 @@ namespace DotNetDataGenerator
             }
             catch { }
 
-            // if (!string.IsNullOrEmpty(connection))
-            // {
-            //     if (connection.Contains("LocalSimulator"))
-            //     {
-            //         connection = null;
-            //     }
-            // }
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
@@ -117,16 +110,12 @@ namespace DotNetDataGenerator
 
             var payload = chance.Object<Payload>();
 
-            //for (int i = 0; i < 1000; i++)
-            var i = 1;
-            while (i < 5)
+            for (int i = 0; i < 1000; i++)
             {
-                payload.ValueNumeric = chance.Integer(250, 300);
-                payload.ValueVarchar = payload.ValueNumeric.ToString();
-                payload.Confidence = chance.Integer(50, 100);
-                payload.TagKey = "58418";
+                payload.Confidence = chance.Double(0, 1);
+                payload.IsAlive = chance.Bool(payload.Confidence);
+                payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;
-                payload.ProcessedTimestamp = DateTime.UtcNow;
                 var msg = JsonConvert.SerializeObject(payload);
                 var messageBytes = Encoding.UTF8.GetBytes(msg);
 

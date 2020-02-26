@@ -214,7 +214,7 @@ namespace DotNetDataRecorder
                     // Insert some data
                     using (var cmd =
                         new NpgsqlCommand(
-                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{p.ValueVarchar}',{p.ValueNumeric},{p.Confidence},'{p.ProcessedTimestamp}','{p.TagKey}')",
+                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{Convert.ToInt16(p.IsAlive)}','{p.Confidence}','{p.TagKey}')",
                             conn))
                     {
                         await cmd.ExecuteNonQueryAsync();
@@ -226,31 +226,6 @@ namespace DotNetDataRecorder
                 Console.WriteLine(e);
                 Log.Warning($"Error SaveData message: {e}");
             }
-           
-            try
-            {
-                var connString = "Server=auazexedgexxdev.australiaeast.cloudapp.azure.com;Port=8081;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
-                //var connString = "Server=localhost;Port=5432;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
-
-                using (var conn = new NpgsqlConnection(connString))
-                {
-                    await conn.OpenAsync();
-                    // Insert some data
-                    using (var cmd =
-                        new NpgsqlCommand(
-                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{p.ValueVarchar}',{p.ValueNumeric},{p.Confidence},'{p.ProcessedTimestamp}','{p.TagKey}')",
-                            conn))
-                    {
-                        await cmd.ExecuteNonQueryAsync();
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                Log.Warning($"Error SaveData message: {e}");
-            }
-            //
         }
 
     }

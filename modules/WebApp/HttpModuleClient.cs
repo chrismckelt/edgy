@@ -155,12 +155,10 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
             var i = 1;
             while (i < 500)
             {
-                payload.ValueNumeric = chance.Integer(250, 300);
-                payload.ValueVarchar = payload.ValueNumeric.ToString();
-                payload.Confidence = chance.Integer(50, 100);
-                payload.TagKey = "58418";
+                payload.Confidence = chance.Double(0, 1);
+                payload.IsAlive = chance.Bool(payload.Confidence);
+                payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;
-                payload.ProcessedTimestamp = DateTime.UtcNow;
                 var msg = JsonConvert.SerializeObject(payload);
                 var messageBytes = Encoding.UTF8.GetBytes(msg);
 

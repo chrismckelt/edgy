@@ -39,7 +39,7 @@ async def main():
         if not HOST:
              HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
 
-        #HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
+        HOST = "timescaledb"
 
         print(HOST)
         # define behavior for receiving an input message on input1
@@ -54,7 +54,7 @@ async def main():
                 data = json.loads(payload.data)
                 print(data["TimeStamp"])
                 """ insert data into table """
-                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{ValueVarchar}',{ValueNumeric},{Confidence},'{ProcessedTimestamp}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],ValueVarchar=data["ValueVarchar"],ValueNumeric=data["ValueNumeric"],Confidence=data["Confidence"],ProcessedTimestamp=data["ProcessedTimestamp"],TagKey=data["TagKey"])
+                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Confidence}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=1,Confidence=data["Confidence"],TagKey=data["TagKey"])
                 print(sql)
                 conn = None
                 try:

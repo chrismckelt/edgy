@@ -53,7 +53,7 @@ namespace WebApp
             }
         }
 
-        private static Random rd = new Random();
+        private static readonly Random Rd = new Random();
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
@@ -61,16 +61,12 @@ namespace WebApp
 
             while (!stoppingToken.IsCancellationRequested)
             {
-                var r = new Random();
-                var payload = new Payload
-                {
-                    Confidence = r.Next(30, 100),
-                    TimeStamp = DateTime.UtcNow.AddDays(-7).AddMinutes(r.Next(1, 600)),
-                    ValueNumeric = r.Next(200, 300)
-                };
-
-                payload.ProcessedTimestamp = payload.TimeStamp.AddMinutes(r.Next(100, 1000));
-                payload.ValueVarchar = payload.ValueNumeric.ToString();
+                var payload = new Payload{};
+                payload.TimeStamp = DateTime.UtcNow;
+                payload.Confidence = Rd.NextDouble();
+                payload.IsAlive = Rd.Next() % 2 == 0;
+                payload.TagKey = "dotnet";
+                payload.TimeStamp = DateTime.UtcNow;
 
                 await QueuePayload(payload);
 

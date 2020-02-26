@@ -30,7 +30,7 @@ Client.fromEnvironment(Transport, function(err, client) {
         for (let i = 0; i < 10; i++) {
           sleep(60000, () => {
             const eventData =
-              '{"TimeStamp":"2020-02-02T10:31:15.5831884Z","ProcessedTimestamp":"2020-02-02T10:31:15.5831894Z","ValueVarchar":"276","ValueNumeric":276.0,"Confidence":90,"TagKey":"58418"}';
+              '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":true,"Confidence":0.76241135306768648,"TagKey":"nodejs"}';
 
               const num = chance.integer({ min: 250, max: 300 });
               const data = {

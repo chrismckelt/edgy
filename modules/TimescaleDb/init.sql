@@ -1,11 +1,9 @@
 create table if not exists table_001
 (
    "Timestamp" timestamp with time zone not null,
-   value_varchar varchar not null,
-   value_numeric numeric not null,
-   confidence integer not null,
-   processedtimestamp timestamp with time zone not null,
-   tagkey integer not null
+   isalive smallint not null,
+   confidence decimal not null,
+   tagkey varchar not null
 );
  
 alter table table_001 owner to postgres;
