@@ -8,13 +8,13 @@ WORKDIR /app/
 
 COPY package*.json ./
 
-RUN npm install chance
+RUN npm install pg
 RUN npm install --production
 
 COPY app.js ./
 
-EXPOSE 8086
+EXPOSE 8087
 
 USER node
 
-CMD ["node", "--inspect=0.0.0.0:8086", "app.js"]
+CMD ["node", "--inspect=0.0.0.0:8087", "app.js"]

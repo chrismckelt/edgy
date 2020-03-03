@@ -3,6 +3,7 @@
 var Transport = require("azure-iot-device-mqtt").Mqtt;
 var Client = require("azure-iot-device").ModuleClient;
 var Message = require("azure-iot-device").Message;
+var Chance = require("chance");
 
 Client.fromEnvironment(Transport, function(err, client) {
   if (err) {
@@ -19,27 +20,16 @@ Client.fromEnvironment(Transport, function(err, client) {
       } else {
         console.log("IoT Hub module client initialized");
 
-        // Act on input messages to the module.
-        client.on("inputMessage", function(inputName, msg) {
-          pipeMessage(client, inputName, msg);
-        });
-
-        var Chance = require("chance");
         var chance = new Chance();
 
-        for (let i = 0; i < 10; i++) {
-          sleep(60000, () => {
-            const eventData =
-              '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":true,"Confidence":0.76241135306768648,"TagKey":"nodejs"}';
+        setInterval(()=>{
+          const eventData =
+              '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Confidence":0.76241135306768648,"TagKey":"node"}';
 
-              const num = chance.integer({ min: 250, max: 300 });
               const data = {
                 TimeStamp : chance.date(),
-                ProcessedTimestamp :  chance.date(),
-                ValueNumeric : num,
-                ValueVarchar : num.toString(),
-                Confidence : chance.integer({ min: 250, max: 300 }),
-                TagKey : "58418"
+                Confidence : chance.integer({ min: 0, max: 100 }),
+                TagKey : "node"
               }
 
               var json = JSON.stringify(data);
@@ -52,8 +42,7 @@ Client.fromEnvironment(Transport, function(err, client) {
               outputMsg,
               printResultFor("Sending " + outputMsg)
             );
-          });
-        }
+        }, 1000)
       }
     });
   }
