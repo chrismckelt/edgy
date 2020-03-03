@@ -349,3 +349,5 @@ config/deployment.prod.json
 *.pem
 /scripts/local.ps1
 scripts/dump.txt
+/*.jar
+/config
