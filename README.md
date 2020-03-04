@@ -28,11 +28,13 @@ The code contains the docker build files , code & scripts to create the followin
 •TimeScaleDB -- https://www.timescale.com/  
 •Blob Storage – Edge marketplace  
 
+![demo](https://user-images.githubusercontent.com/662868/75931447-f6bb9e00-5eaf-11ea-8586-bffd117a86cb.png)  
+
+![code](https://user-images.githubusercontent.com/662868/75931447-f6bb9e00-5eaf-11ea-8586-bffd117a86cb.png)  
+
+
 ![edge](https://user-images.githubusercontent.com/662868/74130071-2b736700-4c1c-11ea-938f-59df0adb6f27.png)  
 
 
 ####  For Self Signed Certicates use the docker image here --> [here](https://docs.microsoft.com/en-us/azure/iot-edge/tutorial-machine-learning-edge-05-configure-edge-device)
-
-More info
-
-https://github.com/chrismckelt/edgy/wiki
+ 
