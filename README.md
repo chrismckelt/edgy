@@ -30,7 +30,7 @@ The code contains the docker build files , code & scripts to create the followin
 
 ![demo](https://user-images.githubusercontent.com/662868/75931447-f6bb9e00-5eaf-11ea-8586-bffd117a86cb.png)  
 
-![code](https://user-images.githubusercontent.com/662868/75931447-f6bb9e00-5eaf-11ea-8586-bffd117a86cb.png)  
+![code](https://user-images.githubusercontent.com/662868/75339444-81f2cd80-58cb-11ea-8c08-eb485e8b5e4b.png)  
 
 
 ![edge](https://user-images.githubusercontent.com/662868/74130071-2b736700-4c1c-11ea-938f-59df0adb6f27.png)  
