@@ -214,7 +214,7 @@ namespace DotNetDataRecorder
                     // Insert some data
                     using (var cmd =
                         new NpgsqlCommand(
-                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{Convert.ToInt16(p.IsAlive)}','{p.Confidence}','{p.TagKey}')",
+                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{Convert.ToInt16(p.IsAlive)}','{p.Temperature}','{p.TagKey}')",
                             conn))
                     {
                         await cmd.ExecuteNonQueryAsync();

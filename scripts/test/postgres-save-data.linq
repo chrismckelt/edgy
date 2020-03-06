@@ -35,7 +35,7 @@ async System.Threading.Tasks.Task Main()
 		string connString = "Server=localhost;Port=8081;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
 		
 		Payload p = new Payload();
-		p.Confidence = 99;
+		p.Temperature = 99;
 		p.ProcessedTimestamp = DateTime.Now;
 		p.TimeStamp = DateTime.Now;
 		p.ValueNumeric =44;
@@ -48,7 +48,7 @@ async System.Threading.Tasks.Task Main()
 			// Insert some data
 			using (var cmd =
 				new NpgsqlCommand(
-					$"insert into Table_001 VALUES ('{p.TimeStamp}', '{p.ValueVarchar}',{p.ValueNumeric},{p.Confidence},'{p.ProcessedTimestamp}','{p.TagKey}')",
+					$"insert into Table_001 VALUES ('{p.TimeStamp}', '{p.ValueVarchar}',{p.ValueNumeric},{p.Temperature},'{p.ProcessedTimestamp}','{p.TagKey}')",
 					conn))
 			{
 				await cmd.ExecuteNonQueryAsync();
@@ -73,7 +73,7 @@ public class Payload
 	public decimal ValueNumeric { get; set; }
 
 
-	public Int32 Confidence { get; set; }
+	public Int32 Temperature { get; set; }
 
 	public string TagKey { get; set; }
 

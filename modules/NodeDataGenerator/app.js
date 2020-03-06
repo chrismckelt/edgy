@@ -24,11 +24,11 @@ Client.fromEnvironment(Transport, function(err, client) {
 
         setInterval(()=>{
           const eventData =
-              '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Confidence":0.76241135306768648,"TagKey":"node"}';
+              '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
 
               const data = {
                 TimeStamp : chance.date(),
-                Confidence : chance.integer({ min: 0, max: 100 }),
+                Temperature : chance.integer({ min: 0, max: 100 }),
                 TagKey : "node"
               }
 

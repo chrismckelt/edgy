@@ -23,7 +23,7 @@ void Main()
 		var payload = chance.Object<SamplePayload>();
 		payload.ValueNumeric = chance.Integer(250, 300);
 		payload.ValueVarchar = payload.ValueNumeric.ToString();
-		payload.Confidence = chance.Integer(75, 100);
+		payload.Temperature = chance.Integer(75, 100);
 		payload.TagKey = "58418";
 		payload.TimeStamp = DateTime.UtcNow.AddDays(-1).AddSeconds(i);
 		payload.ProcessedTimestamp = payload.TimeStamp.AddHours(chance.Integer(1, 10)).AddMinutes(chance.Integer(1, 59));
@@ -50,7 +50,7 @@ public class SamplePayload
 	public decimal ValueNumeric { get; set; }
 
 
-	public Int32 Confidence { get; set; }
+	public Int32 Temperature { get; set; }
 
 	public string TagKey { get; set; }
 

@@ -44,7 +44,7 @@ async def main():
         breaker = 1
         while breaker < 100 :
             try:
-                data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Confidence":0.76241135306768648,"TagKey":"python"}'
+                data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
                 print(data)
                 await module_client.send_message_to_output(data, "output1")
                 breaker = breaker + 1

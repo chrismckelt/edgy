@@ -63,7 +63,7 @@ namespace WebApp
             {
                 var payload = new Payload{};
                 payload.TimeStamp = DateTime.UtcNow;
-                payload.Confidence = Rd.NextDouble();
+                payload.Temperature = Rd.NextDouble();
                 payload.IsAlive = Rd.Next() % 2 == 0;
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;

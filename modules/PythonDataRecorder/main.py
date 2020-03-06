@@ -54,7 +54,7 @@ async def main():
                 data = json.loads(payload.data)
                 print(data["TimeStamp"])
                 """ insert data into table """
-                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Confidence}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=1,Confidence=data["Confidence"],TagKey=data["TagKey"])
+                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=1,Temperature=data["Temperature"],TagKey=data["TagKey"])
                 print(sql)
                 conn = None
                 try:

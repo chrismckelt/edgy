@@ -2,14 +2,14 @@ import psycopg2
 import json
 
 
-payload = '{"TimeStamp":"2020-01-30T22:53:25.3915418Z","ProcessedTimestamp":"2020-01-31T01:09:25.3915418Z","ValueVarchar":"256","ValueNumeric":256.0,"Confidence":88,"TagKey":"58418"}'
+payload = '{"TimeStamp":"2020-01-30T22:53:25.3915418Z","ProcessedTimestamp":"2020-01-31T01:09:25.3915418Z","ValueVarchar":"256","ValueNumeric":256.0,"Temperature":88,"TagKey":"58418"}'
 
 data = json.loads(payload)
 
 print(data["TimeStamp"])
 
 """ insert a new vendor into the vendors table """
-sql = """insert into Table_001 VALUES ('{TimeStamp}', '{ValueVarchar}',{ValueNumeric},{Confidence},'{ProcessedTimestamp}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],ValueVarchar=data["ValueVarchar"],ValueNumeric=data["ValueNumeric"],Confidence=data["Confidence"],ProcessedTimestamp=data["ProcessedTimestamp"],TagKey=data["TagKey"])
+sql = """insert into Table_001 VALUES ('{TimeStamp}', '{ValueVarchar}',{ValueNumeric},{Temperature},'{ProcessedTimestamp}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],ValueVarchar=data["ValueVarchar"],ValueNumeric=data["ValueNumeric"],Temperature=data["Temperature"],ProcessedTimestamp=data["ProcessedTimestamp"],TagKey=data["TagKey"])
 
 print(sql)
 

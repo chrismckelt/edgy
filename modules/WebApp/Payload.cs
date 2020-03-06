@@ -8,7 +8,7 @@ namespace WebApp
 
         public bool IsAlive { get; set; }
 
-        public double Confidence  { get; set; }
+        public double Temperature  { get; set; }
 
         public string TagKey  { get; set; }
 
