@@ -11,6 +11,7 @@ from six.moves import input
 import threading
 from azure.iot.device.aio import IoTHubModuleClient
 import psycopg2
+#from double import Double
 
 import ptvsd
 #ptvsd.enable_attach(('127.0.0.1',  5678))
@@ -52,9 +53,15 @@ async def main():
                 print( "    Data: <<{}>>".format(payload.data) )
                 print( "    Properties: {}".format(payload.custom_properties))
                 data = json.loads(payload.data)
+                isalive = 0
+                #half =  float(0.5)
+
+                # if (float(data["Temperature"]) > half)
+                #     isalive = 1
+                # end
                 print(data["TimeStamp"])
                 """ insert data into table """
-                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=1,Temperature=data["Temperature"],TagKey=data["TagKey"])
+                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=isalive,Temperature=data["Temperature"],TagKey=data["TagKey"])
                 print(sql)
                 conn = None
                 try:

@@ -36,8 +36,8 @@ async def main():
         
         HOST = os.environ.get('TimeScaleDB.Host')
 
-        if not HOST:
-             HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
+       # if not HOST:
+        #     HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
 
         #HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
         print(HOST)
@@ -50,7 +50,7 @@ async def main():
                 breaker = breaker + 1
             except:
                 breaker = breaker + 1
-                time.sleep(10)
+                time.sleep(1)
         # Finally, disconnect
         await module_client.disconnect()
 
