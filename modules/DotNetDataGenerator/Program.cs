@@ -113,7 +113,7 @@ namespace DotNetDataGenerator
             for (int i = 0; i < 1000; i++)
             {
                 payload.Temperature = chance.Double(0, 1);
-                payload.IsAlive = chance.Bool(payload.Temperature);
+                payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;
                 var msg = JsonConvert.SerializeObject(payload);

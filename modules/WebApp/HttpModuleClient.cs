@@ -156,7 +156,7 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
             while (i < 500)
             {
                 payload.Temperature = chance.Double(0, 1);
-                payload.IsAlive = chance.Bool(payload.Temperature);
+                payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;
                 var msg = JsonConvert.SerializeObject(payload);

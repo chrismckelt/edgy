@@ -6,7 +6,7 @@ namespace WebApp
     {
         public DateTime TimeStamp { get; set; }
 
-        public bool IsAlive { get; set; }
+        public bool IsAirConditionerOn { get; set; }
 
         public double Temperature  { get; set; }
 

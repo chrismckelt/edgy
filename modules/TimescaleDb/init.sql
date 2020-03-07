@@ -1,7 +1,7 @@
 create table if not exists table_001
 (
    "Timestamp" timestamp with time zone not null,
-   isalive smallint not null,
+   IsAirConditionerOn smallint not null,
    Temperature decimal not null,
    tagkey varchar not null
 );

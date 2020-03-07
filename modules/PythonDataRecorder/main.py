@@ -53,15 +53,11 @@ async def main():
                 print( "    Data: <<{}>>".format(payload.data) )
                 print( "    Properties: {}".format(payload.custom_properties))
                 data = json.loads(payload.data)
-                isalive = 0
-                #half =  float(0.5)
-
-                # if (float(data["Temperature"]) > half)
-                #     isalive = 1
-                # end
+                number = 0
+                
                 print(data["TimeStamp"])
                 """ insert data into table """
-                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAlive}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAlive=isalive,Temperature=data["Temperature"],TagKey=data["TagKey"])
+                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAirConditionerOn}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAirConditionerOn=number,Temperature=data["Temperature"],TagKey=data["TagKey"])
                 print(sql)
                 conn = None
                 try:

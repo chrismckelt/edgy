@@ -3,6 +3,7 @@
 # full license information.
 
 import time
+import datetime
 import os
 import sys
 import json
@@ -11,6 +12,7 @@ from six.moves import input
 import threading
 from azure.iot.device.aio import IoTHubModuleClient
 import psycopg2
+import random
 
 import ptvsd
 #ptvsd.enable_attach(('127.0.0.1',  5678))
@@ -44,9 +46,20 @@ async def main():
         breaker = 1
         while breaker < 100 :
             try:
-                data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                print(data)
-                await module_client.send_message_to_output(data, "output1")
+
+                #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
+
+                data = {
+                    "TimeStamp": f"{datetime.datetime.now()}",
+                    "IsAirConditionerOn": 1,
+                    "Temperature": random.randint(15,25),
+                    "TagKey": "python"
+                }
+
+                #obj = Payload(datetime.datetime.now(), 1,0.6,"python")
+                sdata = json.dumps(data)
+                print(sdata)
+                await module_client.send_message_to_output(sdata, "output1")
                 breaker = breaker + 1
             except:
                 breaker = breaker + 1

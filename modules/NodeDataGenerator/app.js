@@ -23,7 +23,7 @@ Client.fromEnvironment(Transport, function(err, client) {
         var chance = new Chance();
 
         setInterval(()=>{
-          // const eventData =        '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAlive":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
+          // const eventData =        '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
             var now = new Date();
             const data = {
               TimeStamp : now,
