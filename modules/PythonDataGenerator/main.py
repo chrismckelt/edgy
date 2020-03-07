@@ -38,21 +38,23 @@ async def main():
         
         HOST = os.environ.get('TimeScaleDB.Host')
 
+        current_temp = 20
        # if not HOST:
         #     HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
 
         #HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
         print(HOST)
         breaker = 1
-        while breaker < 100 :
+        while breaker < 1000 :
             try:
-
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
+
+                current_temp = current_temp + (random.randint(1,100) / 100)
 
                 data = {
                     "TimeStamp": f"{datetime.datetime.now()}",
                     "IsAirConditionerOn": 1,
-                    "Temperature": random.randint(15,25),
+                    "Temperature":  current_temp,
                     "TagKey": "python"
                 }
 
@@ -63,7 +65,8 @@ async def main():
                 breaker = breaker + 1
             except:
                 breaker = breaker + 1
-                time.sleep(1)
+                
+            time.sleep(1)
         # Finally, disconnect
         await module_client.disconnect()
 

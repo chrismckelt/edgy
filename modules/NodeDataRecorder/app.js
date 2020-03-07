@@ -47,9 +47,12 @@ function pipeMessage(client, inputName, msg, pool) {
 
   var message = msg.getBytes().toString("utf8");
   if (message) {
-    var m = new Message(message);
+    //var m = new Message(message);
+    console.log(JSON.stringify(message));
+    var m = JSON.parse(message)
     //  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
-    var sql = `insert into Table_001 VALUES ('2020-02-26T03:38:07.2354044Z', 0,0.76241135306768648,'node')`
+    var sql = `insert into Table_001 VALUES ('${m.TimeStamp}', ${m.IsAirConditionerOn},${m.Temperature},'node')`
+
     console.log(sql);
     pool.query(
       sql,

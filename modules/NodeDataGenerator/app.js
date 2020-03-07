@@ -21,13 +21,21 @@ Client.fromEnvironment(Transport, function(err, client) {
         console.log("IoT Hub module client initialized");
 
         var chance = new Chance();
+        var counter = 1;
+        var currentTemp = 20;
 
-        setInterval(()=>{
+        var interval = setInterval(()=>{
           // const eventData =        '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
             var now = new Date();
+            var add = chance.floating({ min: 0, max: 1,fixed: 2  });
+            currentTemp = currentTemp + add;
+
+            if (!currentTemp) currentTemp = 1;
+
             const data = {
               TimeStamp : now,
-              Temperature : chance.integer({ min: 0, max: 100 }),
+              Temperature : currentTemp,
+              IsAirConditionerOn:  1,
               TagKey : "node"
             }
             var json = JSON.stringify(data);
@@ -40,6 +48,9 @@ Client.fromEnvironment(Transport, function(err, client) {
               outputMsg,
               printResultFor("Sending " + outputMsg)
             );
+
+            if (counter === 1000)   clearInterval(interval);
+
         }, 1000)
       }
     });
@@ -56,12 +67,6 @@ function printResultFor(op) {
       console.log(op + " status: " + res.constructor.name);
     }
   };
-}
-
-function sleep(time, callback) {
-  var stop = new Date().getTime();
-  while (new Date().getTime() < stop + time) {}
-  callback();
 }
 
 // This function just pipes the messages without any change.

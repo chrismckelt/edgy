@@ -110,12 +110,16 @@ namespace DotNetDataGenerator
 
             var payload = chance.Object<Payload>();
 
+            var currentTemp = 20d;
+
             for (int i = 0; i < 1000; i++)
             {
-                payload.Temperature = chance.Double(0, 1);
+                currentTemp = currentTemp + chance.Double(0, 1); 
+                payload.Temperature = currentTemp; //chance.Double(1, 1000);
                 payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
                 payload.TagKey = "dotnet";
-                payload.TimeStamp = DateTime.UtcNow;
+                payload.TimeStamp = DateTime.Now;
+
                 var msg = JsonConvert.SerializeObject(payload);
                 var messageBytes = Encoding.UTF8.GetBytes(msg);
 
@@ -133,7 +137,7 @@ namespace DotNetDataGenerator
                     Log.Error(ex, "DotNetDataGenerator {0}", payload);
                 }
 
-                Thread.Sleep(10000);
+                Thread.Sleep(1000);
                 i++;
             }
         }
