@@ -8,7 +8,7 @@ This repo contains an Azure IoT Edge solution that will deploy the below modules
 
 More info 
 
-http://blog.mckelt.com/2020/02/13/azure-iot-edge-creating-an-edge-reporting-solution/
+http://blog.mckelt.com/2020/02/13/azure-iot-edge-who-is-cooler-dotnet-node-python/
  
 ### Modules
 
