@@ -47,15 +47,16 @@ Client.fromEnvironment(Transport, function(err, client) {
               azureStorageConfig.containerName = data.containername;
 
               // Process the files
-              setCertificatefile(certificatefile);
-              setFlowfile(flowversion);
+              copyConfig();
+              setCertificates();
+              //setFlowfile(flowversion);
 
               // Restart NiFi
               restartNifi();
 
               // Report back status
-              var reported = { flowversion: flowversion };
-              sendReportedProperties(reported);
+              // var reported = { flowversion: flowversion };
+              // sendReportedProperties(reported);
             });
           }
         });
@@ -100,33 +101,26 @@ function sendReportedProperties(data) {
   });
 }
 
-function setCertificatefile(file) {
+function copyConfig(){
+  try {
+    // make sure this matches the linux HOST machines config.yaml
+    // this is for ubuntu
+    execSync(
+      "cp -R /config/local/nifi/* /opt/nifi/nifi-current/"
+    );
+    console.log("[INFO] copyConfig successful");
+  } catch (err) {
+    console.warn("[WARN] Error copyConfig: " + err.message);
+    console.warn(err);
+  }
+}
+
+
+function setCertificates() {
   // Laoding certificate file
   console.log("[INFO] Loading certificate file.");
-  importCert("rootca", "/config/certs/azure-iot-test-only.root.ca.cert.pem");
-  importCert("device", "/config/certs/new-edge-device.cert.pem");
-  importCert("fullchain", "/config/certs/new-edge-device-full-chain.cert.pem");
- 
-  return;
-  if (file) {
-    var download = downloadBlob(file, "/config/");
-    download
-      .then(function() {
-        try {
-          execSync("keytool -import -noprompt -alias iot-edge-production-full -file /config/" + file + " -keystore /usr/local/openjdk-8/lib/security/cacerts -storepass changeit");
-          console.log("[INFO] Loading certificate DOWNLOADED successful. " + file);
-        } catch (err) {
-          console.warn(
-            "[WARN] Error loading DOWNLOADED certificate: " + file + err.message
-          );
-          console.warn(err);
-        }
-      })
-      .catch(function(err) {
-        console.warn("[ERROR] Error downloading flow file: " + err.message);
-        console.warn(err);
-      });
-  }
+  importCert("rootca", "/config/certs//config/local/certs/edge-device-ca/cert/edge-device-ca-root.cert.pem");
+  importCert("device", "/config/local/certs/edge-device-ca/cert/edge-device-ca.cert.pem");
 }
 
 function importCert(alias, certname) {
@@ -145,7 +139,6 @@ function importCert(alias, certname) {
     console.warn(err);
   }
 
-
 }
 
 function setFlowfile(version) {
@@ -158,8 +151,6 @@ function setFlowfile(version) {
   // } catch (err) {
   //   console.warn("[WARN] Error loading flow file: " + err.message);
   // }
-  
-  return;
 
   // Load flow file from /config directory (can also be done from blob storage online)
   if (version) {

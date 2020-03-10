@@ -1,44 +1,11 @@
-#FROM apache/nifi
-#FROM node:8-alpine
-#FROM iaazeedgexcontainerstore.azurecr.io/south32/nifi:latest
+FROM apache/nifi
 
-# add Java & Apache Nifi
-#RUN apk update && apk upgrade 
-#RUN apk add --no-cache openjdk8
-#RUN apk add wget 
-#RUN wget http://apache.redkiwi.nl/nifi/1.10.0/nifi-1.10.0-bin.tar.gz 
-#RUN tar zxvf nifi-1.10.0-bin.tar.gz
-#RUN rm nifi-1.10.0-bin.tar.gz
-#
-#RUN apk update
-#RUN apk add --update nodejs nodejs-npm
-#RUN npm add npm -g
+USER root
 
-#WORKDIR /module
+EXPOSE 8080 8443 10000
 
-#COPY package*.json ./
-
-#RUN npm install --production
-
-#EXPOSE 8080/tcp
-
-#COPY app.js ./
-#CMD ["node", "--inspect=0.0.0.0:9229", "app.js"]
-
-#  NON ALPINE IMAGE 
-FROM ubuntu:bionic
-
-#USER root
-
-WORKDIR /
-
-# Install Java & Apache Nifi
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install openjdk-8-jdk -y
-RUN apt-get install wget -y
-RUN wget http://apache.redkiwi.nl/nifi/1.10.0/nifi-1.10.0-bin.tar.gz 
-RUN tar zxvf nifi-1.10.0-bin.tar.gz
-RUN rm nifi-1.10.0-bin.tar.gz
+RUN unset EdgeModuleCACertificateFile
+RUN unset EdgeHubConnectionString
 
 WORKDIR /module
 
@@ -50,13 +17,15 @@ RUN apt-get update; \
     apt-get install -y nodejs; \
     rm -rf /var/lib/apt/lists/*
 
-#RUN apt-get install nodejs npm -y --fix-missing
+RUN apt-get install nodejs npm -y --fix-missing
 RUN npm install npm -g
 RUN npm install --production
-
-EXPOSE 8080/tcp
 
 COPY app.js ./
 
 #CMD ["node", "app.js"]
-CMD ["node", "--inspect=0.0.0.0:9229", "app.js"]
+CMD ["node", "--inspect=0.0.0.0:8443", "app.js"]
+
+WORKDIR ${NIFI_HOME}
+
+# ENTRYPOINT ["../scripts/start.sh"]

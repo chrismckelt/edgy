@@ -86,7 +86,7 @@
           "PythonDataGenerator": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.PythonDataGenerator.debug}",
@@ -166,7 +166,7 @@
           "DotNetDataGenerator": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.DotNetDataGenerator.debug}",
@@ -220,8 +220,8 @@
           "Nifi": {
             "version": "1.0",
             "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
+            "status": "stopped",
+            "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.Nifi.debug}",
               "createOptions": {
@@ -253,8 +253,8 @@
           "WebApp": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
-            "restartPolicy": "never",
+            "status": "running",
+            "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.WebApp.debug}",
               "createOptions": {
@@ -283,13 +283,17 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "AllToUpstream": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO $upstream",
+          "AllToUpstream": "FROM /messages/modules/* INTO $upstream",
+
           "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/DotNetDataRecorder/inputs/input1\")",
           "PythonDataGeneratorToDataRecorder": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/PythonDataRecorder/inputs/input1\")",
-          "DotNetDataGeneratorToWebApp": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
-          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
-          "DotNetDataGeneratorTNifi": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
-          "NodeDataGeneratorToDataRecorder": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/NodeDataRecorder/inputs/input1\")"
+          "NodeDataGeneratorToDataRecorder": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/NodeDataRecorder/inputs/input1\")",
+          
+          "DotNetToWebApp": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "PythonToWebApp": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "NodeToWebApp": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          
+          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")"
 
         },
         "storeAndForwardConfiguration": {

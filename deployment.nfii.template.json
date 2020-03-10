@@ -1,0 +1,116 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "${CONTAINER_REGISTRY_USERNAME}": {
+                "username": "${CONTAINER_REGISTRY_USERNAME}",
+                "password": "${CONTAINER_REGISTRY_PASSWORD}",
+                "address": "${CONTAINER_REGISTRY_SERVER}"
+              },
+              "docker": {
+                "address": "docker.io",
+                "username": "${CONTAINER_DOCKER_USERNAME}",
+                "password": "${CONTAINER_DOCKER_PASSWORD}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.5",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ]
+                }
+              }
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "PortBindings": {
+                    "5671/tcp": [{
+                      "HostPort": "5671"
+                    }],
+                    "8883/tcp": [{
+                      "HostPort": "8883"
+                    }],
+                    "443/tcp": [{
+                      "HostPort": "443"
+                    }]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "Nifi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.Nifi.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8080/tcp",
+                  "PortBindings": {
+                    "8080/tcp": [{
+                      "HostPort": "8080"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME}"
+              },
+              "NIFI_WEB_HTTP_PORT": {
+                "value": "8080"
+              }
+            }
+          } 
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "PythonDataGeneratorToDataRecorder": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/PythonDataRecorder/inputs/input1\")",
+          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")"
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
