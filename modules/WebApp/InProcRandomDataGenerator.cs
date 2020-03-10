@@ -6,6 +6,7 @@ See README.md for instructions on how to set the environment variables to use Ht
 
 using System;
 using System.Threading;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -58,19 +59,26 @@ namespace WebApp
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("initializing random data generation.");
+            ChanceNET.Chance chance = new ChanceNET.Chance();
+            var list =  new List<string>();
+            list.Add("dotnet");
+            list.Add("node");
+            list.Add("python");
+
+            var currentTemp = 20;
 
             while (!stoppingToken.IsCancellationRequested)
             {
                 var payload = new Payload{};
                 payload.TimeStamp = DateTime.UtcNow;
-                payload.Temperature = Rd.NextDouble();
-                payload.IsAirConditionerOn = Rd.Next() % 2 == 0;
-                payload.TagKey = "dotnet";
-                payload.TimeStamp = DateTime.UtcNow;
+                payload.Temperature = currentTemp + Rd.NextDouble();
+                payload.IsAirConditionerOn = false;
+                payload.TagKey = chance.PickOne(list);
+                payload.TimeStamp = DateTime.Now;
 
                 await QueuePayload(payload);
 
-                await Task.Delay(TimeSpan.FromSeconds(2));
+                await Task.Delay(TimeSpan.FromSeconds(1));
             }
 
             _logger.LogInformation("Cancellation requested.");
