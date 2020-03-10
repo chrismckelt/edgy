@@ -2,7 +2,7 @@
     "$schema-version": "0.0.1",
     "description": "",
     "image": {
-        "repository": "south32/timescaledb",
+        "repository": "timescaledb",
         "tag": {
             "version": "0.0.1",
             "platforms": {
