@@ -28,25 +28,26 @@ using Microsoft.Azure.Devices.Client.Transport.Mqtt;
 using Microsoft.Extensions.Logging;
 using Serilog;
 
-namespace WebApp {
+namespace WebApp
+{
 
-/*Create the module as an ASP.NET Core Background Service
-Details of this implementation pattern (Queued background tasks section) are available here: 
-https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-2.1#queued-background-tasks
-*/
+    /*Create the module as an ASP.NET Core Background Service
+    Details of this implementation pattern (Queued background tasks section) are available here: 
+    https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?view=aspnetcore-2.1#queued-background-tasks
+    */
     public class HttpModuleClient : BackgroundService
-    {           
+    {
         readonly ILogger<HttpModuleClient> _logger;
 
-        private IBackgroundPayloadQueue PayloadQueue {get; set;}
-        private ModuleClient ModuleClient {get; set;}
+        private IBackgroundPayloadQueue PayloadQueue { get; set; }
+        private ModuleClient ModuleClient { get; set; }
 
         public HttpModuleClient(IBackgroundPayloadQueue payloadQueue, ILogger<HttpModuleClient> logger)
-        { 
+        {
             this.PayloadQueue = payloadQueue;
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-        
+
         /*The PipeMessage method is what will connect to the IoT Edge Hub and will queue the shelf data
         for processing. 
         
@@ -69,25 +70,32 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
 
             if (!string.IsNullOrEmpty(messageString))
             {
-                try{
+                try
+                {
                     _logger.LogInformation($"Receiving Message: {messageString.TrimStart('"').TrimEnd('"').Replace('\\', ' ')}");
-       
+
                     Payload productData = JsonConvert.DeserializeObject<Payload>
-                        (messageString.TrimStart('"').TrimEnd('"').Replace("\\",String.Empty));
+                        (messageString.TrimStart('"').TrimEnd('"').Replace("\\", String.Empty));
 
                     PayloadQueue.QueuePayload(productData);
 
-                    if(PayloadQueue.Count() > 5){
-                        while(PayloadQueue.Count() > 5){
+                    if (PayloadQueue.Count() > 1)
+                    {
+                        while (PayloadQueue.Count() > 1)
+                        {
                             await PayloadQueue.DequeueAsync(new CancellationToken()); //throw away result
                             _logger.LogInformation("Dequeue extra data");
                         }
                     }
-                     
+
                     // catch and swallow exceptions 
-                } catch (AggregateException ex){
+                }
+                catch (AggregateException ex)
+                {
                     _logger.LogError($"Error processing message: {ex.Flatten()}");
-                } catch (Exception ex){
+                }
+                catch (Exception ex)
+                {
                     _logger.LogError($"Error processing message: {ex}");
                 }
             }
@@ -97,41 +105,19 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
         // ExecuteAsync is called when IHostedService starts.  
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-
-           string connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString");
-            if (string.IsNullOrEmpty(connection))
-            {
-                connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.User);
-            }
-            try
-            {
-                if (string.IsNullOrEmpty(connection))
-                {
-                    connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.Machine);
-                }
-            }
-            catch { }
-
-            // Open a connection to the Edge runtime
-          
-            if (!string.IsNullOrEmpty(connection))
-            {
-                ModuleClient = ModuleClient.CreateFromConnectionString(connection);
-            }
-            else
-            {
-                var connectionSettings = new AmqpTransportSettings(TransportType.Amqp_Tcp_Only);
-                //settings.CleanSession = true;
-                connectionSettings.RemoteCertificateValidationCallback = ValidateServerCertificate;
-                ITransportSettings[] settings = { connectionSettings };
-                ModuleClient = await ModuleClient.CreateFromEnvironmentAsync();
-            }
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
+            //connectionSettings.CleanSession = true;
+            //connectionSettings.ValidateServerCertificate = ValidateServerCertificate;
+            connectionSettings.RemoteCertificateValidationCallback = ValidateServerCertificate;
+            ITransportSettings[] settings = { connectionSettings };
+            Log.Information($"CreateFromEnvironmentAsync");
+            var ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync();
+            await ioTHubModuleClient.OpenAsync();
             await ModuleClient.OpenAsync(stoppingToken);
             await ModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ModuleClient, stoppingToken);
             Log.Information("input1 listener setup ok");
 
-
-           // await GenerateRandomData();
+            // await GenerateRandomData();
         }
 
         private static async Task GenerateRandomData()
@@ -139,7 +125,7 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
             var mqttSetting = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
             mqttSetting.CleanSession = true;
             mqttSetting.RemoteCertificateValidationCallback = ValidateServerCertificate;
-            ITransportSettings[] settings = {mqttSetting};
+            ITransportSettings[] settings = { mqttSetting };
 
             // Open a connection to the Edge runtime
             var ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings);
@@ -155,7 +141,7 @@ https://docs.microsoft.com/en-us/aspnet/core/fundamentals/host/hosted-services?v
             var i = 1;
             while (i < 500)
             {
-                payload.Temperature = chance.Double(0, 1);
+                payload.Temperature = chance.Double(1, 100);
                 payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow;
