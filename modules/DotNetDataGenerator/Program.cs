@@ -88,37 +88,30 @@ namespace DotNetDataGenerator
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
-            //if (!string.IsNullOrEmpty(connection))
-            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-                //connectionSettings.CleanSession = true;
-                //connectionSettings.ValidateServerCertificate = ValidateServerCertificate;
-                connectionSettings.RemoteCertificateValidationCallback = ValidateServerCertificate;
-                ITransportSettings[] settings = { connectionSettings };
-                Log.Information($"CreateFromEnvironmentAsync");
-                ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync();
+
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only); // setup connection to hubs MQTT broker
+            ITransportSettings[] settings = { connectionSettings };
+            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(); // inbuilt SDK magic to connect using environment variables
 
             try{
-                await ioTHubModuleClient.OpenAsync();
+                await ioTHubModuleClient.OpenAsync(); // 
             }
             catch(Exception ex){
-                Log.Error(ex, "await ioTHubModuleClient.OpenAsync();");
+                Log.Error(ex, "Unable to open connection");
                 throw;
             }
 
-            // send random data
-            var chance = new Chance(42);
-
+            var chance = new Chance(42); // random data generator
             var payload = chance.Object<Payload>();
-
             var currentTemp = 20d;
 
             for (int i = 0; i < 1000; i++)
             {
                 currentTemp = currentTemp + chance.Double(0, 1); 
-                payload.Temperature = currentTemp; //chance.Double(1, 1000);
+                payload.Temperature = currentTemp;  
                 payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
                 payload.TagKey = "dotnet";
-                payload.TimeStamp = DateTime.Now;
+                payload.TimeStamp = DateTime.Now; // just display in local time for demo
 
                 var msg = JsonConvert.SerializeObject(payload);
                 var messageBytes = Encoding.UTF8.GetBytes(msg);

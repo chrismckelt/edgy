@@ -89,7 +89,6 @@ namespace DotNetDataRecorder
 
         /// <summary>
         /// Initializes the ModuleClient and sets up the callback to receive
-        ///  
         /// </summary>
         static async Task Init()
         {
@@ -107,13 +106,6 @@ namespace DotNetDataRecorder
             }
             catch { }
 
-            // if (!string.IsNullOrEmpty(connection))
-            // {
-            //     if (connection.Contains("LocalSimulator"))
-            //     {
-            //         connection = null;
-            //     }
-            // }
 
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
