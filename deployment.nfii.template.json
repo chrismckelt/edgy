@@ -96,6 +96,36 @@
                 "value": "8080"
               }
             }
+          },
+          "DotNetDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.DotNetDataGenerator.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8085/tcp",
+                  "PortBindings": {
+                    "443/tcp": [{
+                      "HostPort": "8085"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
           } 
         }
       }
@@ -104,7 +134,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "PythonDataGeneratorToDataRecorder": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/PythonDataRecorder/inputs/input1\")",
+          "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
           "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")"
         },
         "storeAndForwardConfiguration": {

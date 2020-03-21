@@ -1,4 +1,5 @@
-﻿namespace DotNetDataGenerator
+﻿using System;
+namespace DotNetDataGenerator
 {
     public class Payload
     {
