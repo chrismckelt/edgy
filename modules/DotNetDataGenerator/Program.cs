@@ -105,7 +105,7 @@ namespace DotNetDataGenerator
             var payload = chance.Object<Payload>();
             var currentTemp = 20d;
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 10; i++)
             {
                 currentTemp = currentTemp + chance.Double(0, 1); 
                 payload.Temperature = currentTemp;  
@@ -130,7 +130,7 @@ namespace DotNetDataGenerator
                     Log.Error(ex, "DotNetDataGenerator {0}", payload);
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(TimeSpan.FromSeconds(350));
                 i++;
             }
         }
