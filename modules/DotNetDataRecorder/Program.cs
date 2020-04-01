@@ -50,7 +50,7 @@ namespace DotNetDataRecorder
             Log.Information(Environment.GetEnvironmentVariable("EdgeHubConnectionString"));
             Log.Information(Environment.GetEnvironmentVariable("IotHubConnectionString"));
             Log.Information(Environment.GetEnvironmentVariable("EdgeModuleCACertificateFile"));
-                        
+
 
             try
             {
@@ -92,50 +92,26 @@ namespace DotNetDataRecorder
         /// </summary>
         static async Task Init()
         {
-            string connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.Process);
-            if (string.IsNullOrEmpty(connection))
-            {
-                connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.User);
-            }
+            // Open a connection to the Edge runtime
+           // Open a connection to the Edge runtime
+            ModuleClient ioTHubModuleClient;
+
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only); // setup connection to hubs MQTT broker
+            ITransportSettings[] settings = { connectionSettings };
+            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(); // inbuilt SDK magic to connect using environment variables
+
             try
             {
-                if (string.IsNullOrEmpty(connection))
-                {
-                    connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.Machine);
-                }
-            }
-            catch { }
-
-
-            // Open a connection to the Edge runtime
-            ModuleClient ioTHubModuleClient;
-            if (!string.IsNullOrEmpty(connection) && !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("CreateFromConnectionString") ))
-            {
-                Log.Information($"CreateFromConnectionString ${connection}");
-                
-                ioTHubModuleClient = ModuleClient.CreateFromConnectionString(connection);
-            }
-            else
-            {
-                var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only);
-                //connectionSettings.CleanSession = true;
-                //connectionSettings.ValidateServerCertificate = ValidateServerCertificate;
-                connectionSettings.RemoteCertificateValidationCallback = ValidateServerCertificate;
-                ITransportSettings[] settings = { connectionSettings };
-                Log.Information($"CreateFromEnvironmentAsync");
-                ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync();
-            }
-
-             try{
                 await ioTHubModuleClient.OpenAsync();
             }
-            catch(Exception ex){
+            catch (Exception ex)
+            {
                 Log.Error(ex, "await ioTHubModuleClient.OpenAsync();");
                 throw;
             }
 
             // Register callback to be called when a message is received by the module
-            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", PipeMessage, ioTHubModuleClient);
+            await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", SaveMessage, ioTHubModuleClient);
 
         }
 
@@ -154,11 +130,9 @@ namespace DotNetDataRecorder
         }
 
         /// <summary>
-        /// This method is called whenever the module is sent a message from the EdgeHub. 
-        /// It just pipe the messages without any change.
-        /// It prints all the incoming messages.
+        /// save message sent from EdgeHub. 
         /// </summary>
-        static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        static async Task<MessageResponse> SaveMessage(Message message, object userContext)
         {
             int counterValue = Interlocked.Increment(ref _counter);
 
@@ -174,17 +148,22 @@ namespace DotNetDataRecorder
             Log.Information($"received:{messageString}");
 
             if (!string.IsNullOrEmpty(messageString))
-            {  try{
+            {
+                try
+                {
                     Log.Information($"Receiving Message: {messageString.TrimStart('"').TrimEnd('"').Replace('\\', ' ')}");
-       
-                    Payload payload = JsonConvert.DeserializeObject<Payload>
-                        (messageString.TrimStart('"').TrimEnd('"').Replace("\\",String.Empty));
+
+                    Payload payload = JsonConvert.DeserializeObject<Payload>(messageString.TrimStart('"').TrimEnd('"').Replace("\\", String.Empty));
 
                     await SaveData(payload);
 
-                } catch (AggregateException ex){
+                }
+                catch (AggregateException ex)
+                {
                     Log.Error($"Error processing message: {ex.Flatten()}");
-                } catch (Exception ex){
+                }
+                catch (Exception ex)
+                {
                     Log.Error($"Error processing message: {ex}");
                 }
             }

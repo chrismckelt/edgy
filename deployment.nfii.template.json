@@ -134,8 +134,8 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
-          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")"
+          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
+          "NifiTDotNetDataGenerator": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/DotNetDataGenerator/inputs/input1\")"
         },
         "storeAndForwardConfiguration": {
           "timeToLiveSecs": 7200

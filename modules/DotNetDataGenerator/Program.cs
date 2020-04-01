@@ -17,7 +17,7 @@ namespace DotNetDataGenerator
     {
         private static int _counter;
         private static bool _airconActive = false;
-        private static double _tempChange = 3;
+        private static double _tempChange = 1.5d;
 
         private static void Main(string[] args)
         {
@@ -83,10 +83,12 @@ namespace DotNetDataGenerator
             {
                 await ioTHubModuleClient.OpenAsync(); // 
 
-                // Create a handler for the direct method call
+                // Create a handler for the direct method calls
                 await ioTHubModuleClient.SetMethodHandlerAsync("ActivateAirCon", ActivateAirCon, ioTHubModuleClient);
-
                 await ioTHubModuleClient.SetMethodHandlerAsync("SetTempChange", SetTempChange, ioTHubModuleClient);
+
+                // Register callback to be called when a message is received by the module
+                await ioTHubModuleClient.SetInputMessageHandlerAsync("input1", NifiMessageReceived, ioTHubModuleClient);
             }
             catch (Exception ex)
             {
@@ -96,7 +98,7 @@ namespace DotNetDataGenerator
 
             var chance = new Chance(42); // random data generator
             var payload = chance.Object<Payload>();
-            double currentTemp = 20d;
+            double currentTemp = 18d; // start at 18 degrees celcius
 
             for (int i = 0; i < 1000; i++)
             {
@@ -109,6 +111,7 @@ namespace DotNetDataGenerator
                     }
                     else
                     {
+                        // fix the tempat 18 if it goes below
                         currentTemp = 18;
                     }
 
@@ -117,6 +120,7 @@ namespace DotNetDataGenerator
                 else
                 {
                     // air con OFF increase the heat 
+                    Log.Information($"Increasing heat. Temp: {currentTemp}");
                     currentTemp = currentTemp + chance.Double(1, _tempChange);
                 }
 
@@ -142,7 +146,7 @@ namespace DotNetDataGenerator
                     Log.Error(ex, "DotNetDataGenerator {0}", payload);
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(30));
+                Thread.Sleep(TimeSpan.FromSeconds(60));
                 i++;
             }
         }
@@ -150,7 +154,7 @@ namespace DotNetDataGenerator
         // Handle the direct method call to turn on air con
         private static Task<MethodResponse> ActivateAirCon(MethodRequest methodRequest, object userContext)
         {
-            
+
             Log.Information("ActivateAirCon direct method called");
             var data = Encoding.UTF8.GetString(methodRequest.Data);
 
@@ -166,7 +170,7 @@ namespace DotNetDataGenerator
         //_tempChange
         private static Task<MethodResponse> SetTempChange(MethodRequest methodRequest, object userContext)
         {
-            
+
             Log.Information("SetTempChange direct method called");
             var data = Encoding.UTF8.GetString(methodRequest.Data);
 
@@ -204,6 +208,37 @@ namespace DotNetDataGenerator
 
             return MessageResponse.Completed;
         }
+
+        /// <summary>
+        /// receive msg from Nifi - temp too hot
+        /// </summary>
+        static async Task<MessageResponse> NifiMessageReceived(Message message, object userContext)
+        {
+            int counterValue = Interlocked.Increment(ref _counter);
+
+            var moduleClient = userContext as ModuleClient;
+            if (moduleClient == null)
+            {
+                throw new InvalidOperationException("UserContext doesn't contain " + "expected values");
+            }
+
+            byte[] messageBytes = message.GetBytes();
+            string messageString = Encoding.UTF8.GetString(messageBytes);
+            Payload payload = JsonConvert.DeserializeObject<Payload>(messageString.TrimStart('"').TrimEnd('"').Replace("\\", String.Empty));
+
+            Log.Information($"received:{messageString}");
+
+            if (payload.IsAirConditionerOn == false)
+            { // HOT!
+                Log.Information("########################################");
+                Log.Information($"TURNING ON AIR CON AUTOMATICALLY");
+                Log.Information("########################################");
+                _airconActive = true;
+            }
+
+            return await Task.FromResult(MessageResponse.Completed);
+        }
+
 
         public static bool ValidateServerCertificate(
                 object sender,
