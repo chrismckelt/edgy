@@ -17,6 +17,7 @@ namespace DotNetDataGenerator
     {
         private static int _counter;
         private static bool _airconActive = false;
+        private static double _tempChange = 3;
 
         private static void Main(string[] args)
         {
@@ -84,6 +85,8 @@ namespace DotNetDataGenerator
 
                 // Create a handler for the direct method call
                 await ioTHubModuleClient.SetMethodHandlerAsync("ActivateAirCon", ActivateAirCon, ioTHubModuleClient);
+
+                await ioTHubModuleClient.SetMethodHandlerAsync("SetTempChange", SetTempChange, ioTHubModuleClient);
             }
             catch (Exception ex)
             {
@@ -102,7 +105,7 @@ namespace DotNetDataGenerator
                     // air con is active - cool down
                     if (currentTemp >= 18)
                     {
-                        currentTemp = currentTemp - 3;
+                        currentTemp = currentTemp - _tempChange;
                     }
                     else
                     {
@@ -114,7 +117,7 @@ namespace DotNetDataGenerator
                 else
                 {
                     // air con OFF increase the heat 
-                    currentTemp = currentTemp + chance.Double(1, 3);
+                    currentTemp = currentTemp + chance.Double(1, _tempChange);
                 }
 
                 payload.Temperature = currentTemp;
@@ -155,6 +158,22 @@ namespace DotNetDataGenerator
             _airconActive = Convert.ToBoolean(data);
 
             string result = "{\"result\":\"Executed direct method ActivateAirCon: " + _airconActive.ToString() + "\"}";
+            Log.Information(result);
+            return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 200));
+        }
+
+
+        //_tempChange
+        private static Task<MethodResponse> SetTempChange(MethodRequest methodRequest, object userContext)
+        {
+            
+            Log.Information("SetTempChange direct method called");
+            var data = Encoding.UTF8.GetString(methodRequest.Data);
+
+            // set air con
+            _tempChange = Convert.ToDouble(data);
+
+            string result = "{\"result\":\"Executed direct method SetTempChange: " + _tempChange.ToString() + "\"}";
             Log.Information(result);
             return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 200));
         }
