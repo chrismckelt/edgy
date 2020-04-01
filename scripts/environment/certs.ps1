@@ -21,12 +21,42 @@ sudo chmod 666 /var/run/iotedge/workload.sock
 # COPY certs to NIFI keystore and restart
 
 ## LOCAL SIMULATOR
+cd /opt/nifi/nifi-current/bin
+bash ./nifi.sh stop
+
 cd /config/local/nifi
 cp -R * /opt/nifi/nifi-current/
 keytool -import -noprompt -alias iot-edge1 -file /config/local/certs/edge-device-ca/cert/edge-device-ca-root.cert.pem -keystore /usr/local/openjdk-8/lib/security/cacerts -storepass changeit
 keytool -import -noprompt -alias iot-edge2 -file /config/local/certs/edge-device-ca/cert/edge-device-ca.cert.pem -keystore /usr/local/openjdk-8/lib/security/cacerts -storepass changeit
 cd /opt/nifi/nifi-current/bin
 bash ./nifi.sh restart
+
+## COPY BACK   - manual backup first!
+
+#cd /opt/nifi/nifi-current/bin
+#bash ./nifi.sh stop
+
+mkdir /config/local/nifi/conf
+mkdir /config/local/nifi/content_repository
+mkdir /config/local/nifi/database_repository
+mkdir /config/local/nifi/flowfile_repository
+mkdir /config/local/nifi/provenance_repository
+
+cd /opt/nifi/nifi-current/conf
+cp -R * /config/local/nifi/conf
+
+cd /opt/nifi/nifi-current/content_repository
+cp -R * /config/local/nifi/content_repository
+
+cd /opt/nifi/nifi-current/database_repository
+cp -R * /config/local/nifi/database_repository
+
+cd /opt/nifi/nifi-current/flowfile_repository
+cp -R * /config/local/nifi/flowfile_repository
+
+cd /opt/nifi/nifi-current/provenance_repository
+cp -R * /config/local/nifi/provenance_repository
+
 
 ## PRODUCTION  / local device / cloud device
 unset EdgeModuleCACertificateFile

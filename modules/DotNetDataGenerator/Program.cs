@@ -16,7 +16,7 @@ namespace DotNetDataGenerator
     internal class Program
     {
         private static int _counter;
-
+        private static bool _airconActive = false;
 
         private static void Main(string[] args)
         {
@@ -36,7 +36,7 @@ namespace DotNetDataGenerator
 
             try
             {
-               
+
                 Init().Wait();
 
                 //Wait until the app unloads or is cancelled
@@ -71,21 +71,6 @@ namespace DotNetDataGenerator
         /// </summary>
         private static async Task Init()
         {
-            string connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString");
-            if (string.IsNullOrEmpty(connection))
-            {
-                connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.User);
-            }
-            try
-            {
-                if (string.IsNullOrEmpty(connection))
-                {
-                    connection = Environment.GetEnvironmentVariable("EdgeHubConnectionString", EnvironmentVariableTarget.Machine);
-                }
-            }
-            catch { }
-
-
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
 
@@ -93,23 +78,47 @@ namespace DotNetDataGenerator
             ITransportSettings[] settings = { connectionSettings };
             ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(); // inbuilt SDK magic to connect using environment variables
 
-            try{
+            try
+            {
                 await ioTHubModuleClient.OpenAsync(); // 
+
+                // Create a handler for the direct method call
+                await ioTHubModuleClient.SetMethodHandlerAsync("ActivateAirCon", ActivateAirCon, ioTHubModuleClient);
             }
-            catch(Exception ex){
+            catch (Exception ex)
+            {
                 Log.Error(ex, "Unable to open connection");
                 throw;
             }
 
             var chance = new Chance(42); // random data generator
             var payload = chance.Object<Payload>();
-            var currentTemp = 20d;
+            double currentTemp = 20d;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 1000; i++)
             {
-                currentTemp = currentTemp + chance.Double(0, 1); 
-                payload.Temperature = currentTemp;  
-                payload.IsAirConditionerOn = chance.Bool(payload.Temperature);
+                if (_airconActive)
+                {
+                    // air con is active - cool down
+                    if (currentTemp >= 18)
+                    {
+                        currentTemp = currentTemp - 3;
+                    }
+                    else
+                    {
+                        currentTemp = 18;
+                    }
+
+                    Log.Information($"AIR CON ACTIVE. Temp: {currentTemp}");
+                }
+                else
+                {
+                    // air con OFF increase the heat 
+                    currentTemp = currentTemp + chance.Double(1, 3);
+                }
+
+                payload.Temperature = currentTemp;
+                payload.IsAirConditionerOn = _airconActive;
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.Now; // just display in local time for demo
 
@@ -130,31 +139,30 @@ namespace DotNetDataGenerator
                     Log.Error(ex, "DotNetDataGenerator {0}", payload);
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(350));
+                Thread.Sleep(TimeSpan.FromSeconds(30));
                 i++;
             }
         }
 
-        public static bool ValidateServerCertificate(
-            object sender,
-            X509Certificate certificate,
-            X509Chain chain,
-            SslPolicyErrors sslPolicyErrors)
+        // Handle the direct method call to turn on air con
+        private static Task<MethodResponse> ActivateAirCon(MethodRequest methodRequest, object userContext)
         {
-            if (sslPolicyErrors == SslPolicyErrors.None)
-                return true;
+            
+            Log.Information("ActivateAirCon direct method called");
+            var data = Encoding.UTF8.GetString(methodRequest.Data);
 
-            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+            // set air con
+            _airconActive = Convert.ToBoolean(data);
 
-            return true;
+            string result = "{\"result\":\"Executed direct method ActivateAirCon: " + _airconActive.ToString() + "\"}";
+            Log.Information(result);
+            return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 200));
         }
 
         /// <summary>
-        ///     This method is called whenever the module is sent a message from the EdgeHub.
-        ///     It just pipe the messages without any change.
-        ///     It prints all the incoming messages.
+        ///  Send payload message to the EdgeHub.
         /// </summary>
-        private static async Task<MessageResponse> PipeMessage(Message message, object userContext)
+        private static async Task<MessageResponse> PublishTemperature(Message message, object userContext)
         {
             var counterValue = Interlocked.Increment(ref _counter);
 
@@ -176,6 +184,20 @@ namespace DotNetDataGenerator
                 }
 
             return MessageResponse.Completed;
+        }
+
+        public static bool ValidateServerCertificate(
+                object sender,
+                X509Certificate certificate,
+                X509Chain chain,
+                SslPolicyErrors sslPolicyErrors)
+        {
+            if (sslPolicyErrors == SslPolicyErrors.None)
+                return true;
+
+            Console.WriteLine("Certificate error: {0}", sslPolicyErrors);
+
+            return true;
         }
     }
 }

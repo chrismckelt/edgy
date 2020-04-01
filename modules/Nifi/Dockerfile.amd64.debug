@@ -13,4 +13,6 @@ COPY local.sh ./
 
 WORKDIR ${NIFI_HOME}
 
-########  ["./local.sh"]
+########   docker exec 09749260c619 /bin/sh -c "/module/local.sh"
+
+ENTRYPOINT /module/local.sh
