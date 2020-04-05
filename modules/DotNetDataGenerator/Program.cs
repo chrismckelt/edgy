@@ -17,7 +17,7 @@ namespace DotNetDataGenerator
     {
         private static int _counter;
         private static bool _airconActive = false;
-        private static double _tempChange = 1.5d;
+        private static double _tempChange = 0.5;
 
         private static void Main(string[] args)
         {
@@ -96,9 +96,10 @@ namespace DotNetDataGenerator
                 throw;
             }
 
+            double currentTemp = 20d; // start at 20 degrees celcius
+            _airconActive = false;
             var chance = new Chance(42); // random data generator
             var payload = chance.Object<Payload>();
-            double currentTemp = 18d; // start at 18 degrees celcius
 
             for (int i = 0; i < 1000; i++)
             {
@@ -108,26 +109,28 @@ namespace DotNetDataGenerator
                     if (currentTemp >= 18)
                     {
                         currentTemp = currentTemp - _tempChange;
+                        Log.Information($"aircon on. descreasing by {_tempChange} Temp: {currentTemp}");
                     }
                     else
                     {
                         // fix the tempat 18 if it goes below
                         currentTemp = 18;
+                        _airconActive = false;// turn off
+                        Log.Information($"aircon too cold. turning off {_tempChange} Temp: {currentTemp}");
                     }
 
-                    Log.Information($"AIR CON ACTIVE. Temp: {currentTemp}");
                 }
                 else
                 {
                     // air con OFF increase the heat 
-                    Log.Information($"Increasing heat. Temp: {currentTemp}");
                     currentTemp = currentTemp + chance.Double(1, _tempChange);
+                    Log.Information($"aircon off. increasing by {_tempChange} Temp: {currentTemp}");
                 }
 
                 payload.Temperature = currentTemp;
                 payload.IsAirConditionerOn = _airconActive;
                 payload.TagKey = "dotnet";
-                payload.TimeStamp = DateTime.Now; // just display in local time for demo
+                payload.TimeStamp = DateTime.UtcNow; 
 
                 var msg = JsonConvert.SerializeObject(payload);
                 var messageBytes = Encoding.UTF8.GetBytes(msg);
@@ -228,17 +231,20 @@ namespace DotNetDataGenerator
 
             Log.Information($"received:{messageString}");
 
-            if (payload.IsAirConditionerOn == false)
+            if (payload.TagKey != "dotnet"){
+                return await Task.FromResult(MessageResponse.None);
+            }
+
+            if (payload.IsAirConditionerOn == false && payload.Temperature > 25 && payload.TimeStamp >  DateTime.UtcNow.AddMinutes(-10)) // ignore old events
             { // HOT!
                 Log.Information("########################################");
-                Log.Information($"TURNING ON AIR CON AUTOMATICALLY");
+                Log.Information($"TURNING ON AIR CON - NIFI MESSAGE RECEIVED");
                 Log.Information("########################################");
                 _airconActive = true;
             }
 
             return await Task.FromResult(MessageResponse.Completed);
         }
-
 
         public static bool ValidateServerCertificate(
                 object sender,

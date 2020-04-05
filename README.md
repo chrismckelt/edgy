@@ -2,13 +2,15 @@
 
 # Edgy - an Azure IOT Edge Demo
 
-## Warning: Mega WIP
-
 This repo contains an Azure IoT Edge solution that will deploy the below modules to an IOT Edge device
 
 A walkthrough series on how this was setup is available here:
 
 https://dev.to/chris_mckelt/azure-iot-edge-who-is-cooler-dotnet-node-or-python-369m
+
+# Setup instructions
+
+https://github.com/chrismckelt/edgy/wiki
  
 ## Demo Goal
 
