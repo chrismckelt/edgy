@@ -23,16 +23,16 @@ Client.fromEnvironment(Transport, function(err, client) {
       } else {
         console.log("IoT Hub module client initialized");
 
-        var currentTemp = 20;
-        var chance = new Chance();
-        var counter = 1;
-       
-         // Act on input messages to the module.
-         client.on("inputMessage", function(inputName, msg) {
+        // Act on input messages to the module.
+        client.on("inputMessage", function(inputName, msg) {
           console.log(`message received ${msg}`);
-          pipeMessage(client, inputName, msg, pool);
+          pipeMessage(client, inputName, msg);
         });
 
+        var currentTemp = 20;
+        var counter = 1;
+        var chance = new Chance();
+        
         var interval = setInterval(()=>{
           // const eventData =        '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
             var utc = new Date().getUTCDate();
@@ -54,12 +54,11 @@ Client.fromEnvironment(Transport, function(err, client) {
                     _airconActive = false;// turn off
                     console.log(`aircon too cold. turning off`);
                 }
-
             }
             else
             {
                 // air con OFF increase the heat 
-                currentTemp = currentTemp + chance.Double(1, _tempChange);
+                currentTemp = currentTemp + _tempChange;
                 console.log(`aircon off. increasing by ${_tempChange} Temp: ${currentTemp}`);
             }
 
