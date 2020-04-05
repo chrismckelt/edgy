@@ -46,6 +46,12 @@ function pipeMessage(client, inputName, msg, pool) {
   client.complete(msg, printResultFor("Receiving message"));
 
   var message = msg.getBytes().toString("utf8");
+  if (inputName === 'input1') {
+    saveToDatabase(pool, message);
+  }
+}
+
+function saveToDatabase(message){
   if (message) {
     //var m = new Message(message);
     console.log(JSON.stringify(message));
