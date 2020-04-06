@@ -1,1 +1,2 @@
-azure-iot-device~=2.0.0
+azure-iot-device~=2.1.1
+chance~=0.110

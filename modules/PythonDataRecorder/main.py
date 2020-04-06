@@ -22,14 +22,7 @@ async def main():
             raise Exception( "PythonDataRecorder requires python 3.5.3+. Current version of Python: %s" % sys.version )
         print ( "IoT Hub Client for Python" )
 
-        module_client = None    # The client object is used to interact with your Azure IoT hub.
-
-        connection_string = None #os.environ.get('EdgeHubConnectionString')
-        print(connection_string)
-        if not connection_string:
-            module_client = IoTHubModuleClient.create_from_edge_environment()
-        else:
-            module_client = IoTHubModuleClient.create_from_connection_string(connection_string)
+        module_client = IoTHubModuleClient.create_from_edge_environment() # The client object is used to interact with your Azure IoT hub.
 
  #       module_client = IoTHubModuleClient.create_from_edge_environment()
         # connect the client.
@@ -38,7 +31,7 @@ async def main():
         HOST = os.environ.get('TimeScaleDB.Host')
 
         if not HOST:
-             HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
+            HOST = "auazexedgexxdev.australiaeast.cloudapp.azure.com"
 
         HOST = "timescaledb"
 

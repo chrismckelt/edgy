@@ -97,7 +97,7 @@ function printResultFor(op) {
 
 // This function just pipes the messages without any change.
 function pipeMessage(client, inputName, msg) {
-  client.complete(msg, printResultFor("Receiving message"));
+  client.complete(msg, printResultFor("receiving message"));
   var message = msg.getBytes().toString("utf8");
   if (inputName === "input1") {
     console.log("################# ActivateAirCon #################");
