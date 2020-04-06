@@ -19,11 +19,10 @@ import ptvsd
 #ptvsd.enable_attach(('127.0.0.1',  5678))
 #https://github.com/Azure/azure-iot-sdk-python/tree/master/azure-iot-device/samples/async-edge-scenarios
 
+messages_to_send = 1000
+global aircon_active
+
 async def main():
-    global messages_to_send = 1000
-    global aircon_active = False
-    global current_temp = 20
-    global temp_change = 0.5
 
     try:
         # Inputs/Ouputs are only supported in the context of Azure IoT Edge and module client
@@ -33,24 +32,30 @@ async def main():
         #module_client = IoTHubModuleClient.create_from_connection_string(conn_str)
         await module_client.connect()
 
+        aircon_active = False
+        current_temp = 20
+        temp_change = 0.5
+
         async def send_test_message(i):
             print("sending message #" + str(i))
 
             try:
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                temp_change = chance.random.randrange(0.5, 1.5)
+                temp_change = 0.5 # chance.random.randrange(0.5, 1.5)
+                aircon_active = False
+                current_temp = 20
 
                 if aircon_active == True:
                     if current_temp > 18:
                         current_temp = current_temp - temp_change
-                        print('aircon on. descreasing by ${temp_change} Temp: ${current_temp}')
+                        print(f"aircon on. descreasing by {temp_change} Temp: {current_temp}")
                     else:
                         current_temp = 18
                         aircon_active = False
                         print('aircon too cold. turning off')
                 else:        
                     current_temp = current_temp + temp_change
-                    print('aircon on. increasing by ${temp_change} Temp: ${current_temp}')
+                    print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
                 
                 data = {
                     "TimeStamp": f"{datetime.datetime.utcnow()}",
@@ -59,13 +64,16 @@ async def main():
                     "TagKey": "python"
                 }
 
+                print(f'current temp: {current_temp}')
+                print(f'air con active: {aircon_active}')
+                print(f'timestamp: "{datetime.datetime.utcnow()}')
+
                 sdata = json.dumps(data)
                 print(sdata)
-                msg = Message(sdata)
-                msg.message_id = uuid.uuid4()
+                # msg = Message(sdata)
+                # msg.message_id = uuid.uuid4()
 
-                print(sdata)
-                await module_client.send_message_to_output(msg, "output1")
+                #await module_client.send_message_to_output(msg, "output1")
                 print("done sending message #" + str(i))
                 time.sleep(60)
             except:
