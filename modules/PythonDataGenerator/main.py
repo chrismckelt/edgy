@@ -21,14 +21,14 @@ import ptvsd
 #https://github.com/Azure/azure-iot-sdk-python/tree/master/azure-iot-device/samples/async-edge-scenarios
 
 messages_to_send = 1000
-aircon_active = False
-current_temp = 20
-temp_change = 0.5
+global aircon_active
+global current_temp
+global temp_change
+global state 
 
 async def main():
-    
-    aircon_active = False
 
+    
     try:
         # Inputs/Ouputs are only supported in the context of Azure IoT Edge and module client
         # The module client object acts as an Azure IoT Edge module and interacts with an Azure IoT Edge hub
@@ -37,62 +37,75 @@ async def main():
         #module_client = IoTHubModuleClient.create_from_connection_string(conn_str)
         await module_client.connect()
 
+        aircon_active = False
+        current_temp = 20
+        temp_change = 0.5
+        state = [0, 20]
+
         # define behavior for receiving an input message on input1
-        async def send_test_message(i):
-            print("sending message #" + str(i))
-            aa = aircon_active
-            try:
+        async def send_message(module_client, state):
+            
+            aircon_active = bool(state[0])
+            current_temp = int(state[1])
+
+            i = 1
+            while i < 1000 :
+                try:
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                temp_change = chance.random.randrange(0.5, 1.5)
+                    temp_change = 5 #chance.random.randrange(0.5, 1.5)
+                    print("sending message #" + str(i))
+                    if aircon_active == True:
+                        if current_temp > 18:
+                            current_temp = current_temp - temp_change
+                            print(f"aircon on. descreasing by {temp_change} Temp: {current_temp}")
+                        else:
+                            current_temp = 18
+                            print('aircon too cold. turning off')
+                    else:        
+                        current_temp = current_temp + temp_change
+                        print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
+                    
+                    data = {
+                        "TimeStamp": f"{datetime.datetime.utcnow()}",
+                        "IsAirConditionerOn": aircon_active,
+                        "Temperature":  current_temp,
+                        "TagKey": "python"
+                    }
 
-                if aa == True:
-                    if current_temp > 18:
-                        current_temp = current_temp - temp_change
-                        print(f"aircon on. descreasing by {temp_change} Temp: {current_temp}")
-                    else:
-                        current_temp = 18
-                        aircon_active = False
-                        print('aircon too cold. turning off')
-                else:        
-                    current_temp = current_temp + temp_change
-                    print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
-                
-                data = {
-                    "TimeStamp": f"{datetime.datetime.utcnow()}",
-                    "IsAirConditionerOn": aircon_active,
-                    "Temperature":  current_temp,
-                    "TagKey": "python"
-                }
+                    state = [int(aircon_active), current_temp]
+                    print(f'current temp: {current_temp}')
+                    print(f'air con active: {aircon_active}')
+                    print(f'timestamp: "{datetime.datetime.utcnow()}')
 
-                print(f'current temp: {current_temp}')
-                print(f'air con active: {aircon_active}')
-                print(f'timestamp: "{datetime.datetime.utcnow()}')
-
-                sdata = json.dumps(data)
-                print(sdata)
-                msg = Message(sdata)
-                msg.message_id = uuid.uuid4()
-
-                await module_client.send_message_to_output(msg, "output1")
-                time.sleep(30)
-                print("done sending message #" + str(i))
-            except:
-                print("Unexpected error:", sys.exc_info()[0])
-                raise
+                    sdata = json.dumps(data)
+                    print(sdata)
+                    msg = Message(sdata)
+                    msg.message_id = uuid.uuid4()
+                    
+                    await module_client.send_message_to_output(msg, "output1")
+                    print("done sending message #" + str(i))
+                    i = i + 1
+                except:
+                    print("Unexpected error:", sys.exc_info()[0])
+                    raise
 
         
                  # define behavior for receiving an input message on input1
-        async def input1_listener(module_client):
+        async def input1_listener(module_client,state):
             while True:
                 input_message = await module_client.receive_message_on_input("input1")  # blocking call
                 print("################# ActivateAirCon #################")
-                print("the data in the message received on input1 was ")
+                print("message received from nifi ")
                 print(input_message.data)
                 print("######################")
                 print(input_message.custom_properties)
+                state[0] = 1
 
-        listeners = await asyncio.gather(input1_listener(module_client),*[send_test_message(i) for i in range(1, messages_to_send)])
+        listeners = await asyncio.gather(input1_listener(module_client,state), send_message(module_client, state))
+        
+         # *[send_message(i, state) for i in range(1, messages_to_send)]
 
+        
         listeners.cancel()
         # Finally, disconnect
         await module_client.disconnect()
