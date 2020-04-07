@@ -39,20 +39,19 @@ async def main():
 
         aircon_active = False
         current_temp = 20
-        temp_change = 0.5
-        state = [0, 20]
+        temp_change = 1.5
+        state = [0, 20] # mutable object used via async funcs
 
         # define behavior for receiving an input message on input1
         async def send_message(module_client, state):
-            
-            aircon_active = bool(state[0])
-            current_temp = int(state[1])
 
             i = 1
-            while i < 1000 :
+            while i < 10 :
+                aircon_active = bool(state[0])
+                current_temp = int(state[1])
                 try:
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                    temp_change = 5 #chance.random.randrange(0.5, 1.5)
+                    temp_change = random.uniform(1.5, 2.5)
                     print("sending message #" + str(i))
                     if aircon_active == True:
                         if current_temp > 18:
@@ -61,24 +60,22 @@ async def main():
                         else:
                             current_temp = 18
                             print('aircon too cold. turning off')
+                            state[0] = 0;
                     else:        
                         current_temp = current_temp + temp_change
                         print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
                     
-                    data = {
-                        "TimeStamp": f"{datetime.datetime.utcnow()}",
-                        "IsAirConditionerOn": aircon_active,
-                        "Temperature":  current_temp,
-                        "TagKey": "python"
-                    }
+                    
+                    #sdata =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
 
-                    state = [int(aircon_active), current_temp]
-                    print(f'current temp: {current_temp}')
-                    print(f'air con active: {aircon_active}')
-                    print(f'timestamp: "{datetime.datetime.utcnow()}')
-
-                    sdata = json.dumps(data)
+                    sdata = '{"TimeStamp":"AAA","IsAirConditionerOn" : "BBB","Temperature": CCC,"TagKey":"python"}' 
+                    sdata = sdata.replace("AAA", '2020-02-26T03:38:07.2354044Z')
+                    sdata = sdata.replace("BBB", str(aircon_active))
+                    sdata = sdata.replace("CCC", str(current_temp))
                     print(sdata)
+                    state[1] = current_temp
+                    #sdata = json.dumps(data)
+                 
                     msg = Message(sdata)
                     msg.message_id = uuid.uuid4()
                     
@@ -94,12 +91,17 @@ async def main():
         async def input1_listener(module_client,state):
             while True:
                 input_message = await module_client.receive_message_on_input("input1")  # blocking call
-                print("################# ActivateAirCon #################")
+               
                 print("message received from nifi ")
                 print(input_message.data)
-                print("######################")
-                print(input_message.custom_properties)
-                state[0] = 1
+                
+                payload = json.loads(input_message.data)
+                print(payload["IsAirConditionerOn"])
+                print(payload["Temperature"])
+
+                if  bool(payload["IsAirConditionerOn"]) and float(payload["Temperature"])> 25:
+                    state[0] = 1
+                    print("################# ActivateAirCon #################")
 
         listeners = await asyncio.gather(input1_listener(module_client,state), send_message(module_client, state))
         

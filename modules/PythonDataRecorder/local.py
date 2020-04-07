@@ -12,33 +12,26 @@ from azure.iot.device.aio import IoTHubModuleClient
 import psycopg2
 #from double import Double
 import payload
+import pytz
+
+from datetime import datetime, timezone
+
+# data = '{ "TimeStamp": "2020-04-07 09:22:05.807444", "IsAirConditionerOn": "False", "Temperature": 29.413214813914912, "TagKey": "python" }'
+
+# #obj = Payload(datetime.datetime.now(), 1,0.6,"python")
+# sdata = json.loads(data)
+# print(sdata["IsAirConditionerOn"])
  
-data = {
-    "TimeStamp": f"{datetime.datetime.now()}",
-    "IsAirConditionerOn": 1,
-    "Temperature": 40,
-    "TagKey": "python"
-}
 
-#obj = Payload(datetime.datetime.now(), 1,0.6,"python")
-sdata = json.dumps(data)
+aircon_active = True
+current_temp = 21
+ 
+ 
+
+# data = json.load(sdata)
+# #sdata = '{"TimeStamp":"{dt}","IsAirConditionerOn":"{aircon_active}","Temperature":{current_temp},"TagKey":"python"}'
+
+sdata =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
+
+
 print(sdata)
-HOST = "timescaledb"
-
-print(data["TimeStamp"])
-""" insert data into table """
-sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAirConditionerOn}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAirConditionerOn=data["IsAirConditionerOn"],Temperature=data["Temperature"],TagKey=data["TagKey"])
-print(sql)
-conn = None
-try:
-    conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="m5asuFHqBE",port=5432)  #8881
-    #conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="m5asuFHqBE",port=8081)  #8881
-    cur = conn.cursor()
-    cur.execute(sql)
-    conn.commit()
-    cur.close()
-except (Exception, psycopg2.DatabaseError) as error:
-    print(error)
-finally:
-    if conn is not None:
-        conn.close()
