@@ -21,9 +21,13 @@ import ptvsd
 #https://github.com/Azure/azure-iot-sdk-python/tree/master/azure-iot-device/samples/async-edge-scenarios
 
 messages_to_send = 1000
-global aircon_active
+aircon_active = False
+current_temp = 20
+temp_change = 0.5
 
 async def main():
+    
+    aircon_active = False
 
     try:
         # Inputs/Ouputs are only supported in the context of Azure IoT Edge and module client
@@ -33,20 +37,15 @@ async def main():
         #module_client = IoTHubModuleClient.create_from_connection_string(conn_str)
         await module_client.connect()
 
-        aircon_active = False
-        current_temp = 20
-        temp_change = 0.5
-
+        # define behavior for receiving an input message on input1
         async def send_test_message(i):
             print("sending message #" + str(i))
-
+            aa = aircon_active
             try:
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                temp_change = 0.5 # chance.random.randrange(0.5, 1.5)
-                aircon_active = False
-                current_temp = 20
+                temp_change = chance.random.randrange(0.5, 1.5)
 
-                if aircon_active == True:
+                if aa == True:
                     if current_temp > 18:
                         current_temp = current_temp - temp_change
                         print(f"aircon on. descreasing by {temp_change} Temp: {current_temp}")
@@ -75,14 +74,26 @@ async def main():
                 msg.message_id = uuid.uuid4()
 
                 await module_client.send_message_to_output(msg, "output1")
+                time.sleep(30)
                 print("done sending message #" + str(i))
-                time.sleep(10)
             except:
                 print("Unexpected error:", sys.exc_info()[0])
                 raise
 
-        await asyncio.gather(*[send_test_message(i) for i in range(1, messages_to_send)])
-                
+        
+                 # define behavior for receiving an input message on input1
+        async def input1_listener(module_client):
+            while True:
+                input_message = await module_client.receive_message_on_input("input1")  # blocking call
+                print("################# ActivateAirCon #################")
+                print("the data in the message received on input1 was ")
+                print(input_message.data)
+                print("######################")
+                print(input_message.custom_properties)
+
+        listeners = await asyncio.gather(input1_listener(module_client),*[send_test_message(i) for i in range(1, messages_to_send)])
+
+        listeners.cancel()
         # Finally, disconnect
         await module_client.disconnect()
 
