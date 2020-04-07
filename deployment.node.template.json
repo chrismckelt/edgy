@@ -150,7 +150,7 @@
       "properties.desired": {
         "schemaVersion": "1.0",
         "routes": {
-          "NodeDataGeneratorToDataRecorder": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/NodeDataRecorder/inputs/input1\")"
+          "NodeDataGeneratorToDataRecorder": "FROM /messages/modules/NodeDataGenerator/outputs/output1 INTO BrokeredEndpoint(\"/modules/NodeDataRecorder/inputs/input1\")"
 
         },
         "storeAndForwardConfiguration": {

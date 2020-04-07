@@ -28,6 +28,10 @@ global state
 
 async def main():
 
+    print('PythonDataGenerator started...')
+    for i in range(1,60):
+        print('waiting for nifi')
+        time.sleep(1) # wait for nifi
     
     try:
         # Inputs/Ouputs are only supported in the context of Azure IoT Edge and module client
@@ -46,13 +50,13 @@ async def main():
         async def send_message(module_client, state):
 
             i = 1
-            while i < 10 :
+            while i < 100 :
                 aircon_active = bool(state[0])
                 current_temp = int(state[1])
                 try:
                 #data =  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"python"}'
-                    temp_change = random.uniform(1.5, 2.5)
-                    print("sending message #" + str(i))
+                    temp_change = random.uniform(0, 1.5)  # randomise the temp change
+                    #print("sending message #" + str(i))
                     if aircon_active == True:
                         if current_temp > 18:
                             current_temp = current_temp - temp_change
@@ -65,14 +69,12 @@ async def main():
                         current_temp = current_temp + temp_change
                         print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
                     
-                    
                     #sdata =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
 
                     sdata = '{"TimeStamp":"AAA","IsAirConditionerOn" : "BBB","Temperature": CCC,"TagKey":"python"}' 
-                    sdata = sdata.replace("AAA", '2020-02-26T03:38:07.2354044Z')
+                    sdata = sdata.replace("AAA", datetime.datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'))
                     sdata = sdata.replace("BBB", str(aircon_active))
                     sdata = sdata.replace("CCC", str(current_temp))
-                    print(sdata)
                     state[1] = current_temp
                     #sdata = json.dumps(data)
                  
@@ -80,8 +82,10 @@ async def main():
                     msg.message_id = uuid.uuid4()
                     
                     await module_client.send_message_to_output(msg, "output1")
-                    print("done sending message #" + str(i))
+                    print('sent ' + sdata)
+                    #print("done sending message #" + str(i))
                     i = i + 1
+                    time.sleep(10)
                 except:
                     print("Unexpected error:", sys.exc_info()[0])
                     raise
@@ -107,7 +111,6 @@ async def main():
         
          # *[send_message(i, state) for i in range(1, messages_to_send)]
 
-        
         listeners.cancel()
         # Finally, disconnect
         await module_client.disconnect()

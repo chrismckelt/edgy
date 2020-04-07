@@ -3,18 +3,18 @@
 var Transport = require("azure-iot-device-mqtt").Mqtt;
 var Client = require("azure-iot-device").ModuleClient;
 var Message = require("azure-iot-device").Message;
-const { Pool } = require('pg');
+const { Pool } = require("pg");
 
-Client.fromEnvironment(Transport, function(err, client) {
+Client.fromEnvironment(Transport, function (err, client) {
   if (err) {
     throw err;
   } else {
-    client.on("error", function(err) {
+    client.on("error", function (err) {
       throw err;
     });
 
     // connect to the Edge instance
-    client.open(function(err) {
+    client.open(function (err) {
       if (err) {
         throw err;
       } else {
@@ -25,17 +25,16 @@ Client.fromEnvironment(Transport, function(err, client) {
           host: "timescaledb",
           database: "postgres",
           password: "m5asuFHqBE",
-          port: "5432"
+          port: "5432",
         });
 
         console.log(`PG connection pool ok ${pool}`);
 
         // Act on input messages to the module.
-        client.on("inputMessage", function(inputName, msg) {
-          console.log(`message received ${msg}`);
+        client.on("inputMessage", function (inputName, msg) {
+          console.log(`message received ${JSON.stringify(msg)}`);
           pipeMessage(client, inputName, msg, pool);
         });
- 
       }
     });
   }
@@ -46,28 +45,29 @@ function pipeMessage(client, inputName, msg, pool) {
   client.complete(msg, printResultFor("Receiving message"));
 
   var message = msg.getBytes().toString("utf8");
-  if (inputName === 'input1') {
+  if (inputName === "input1") {
     saveToDatabase(pool, message);
   }
 }
 
-function saveToDatabase(message){
+function saveToDatabase(message) {
   if (message) {
     //var m = new Message(message);
-    console.log(JSON.stringify(message));
-    var m = JSON.parse(message)
-    //  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
-    var sql = `insert into Table_001 VALUES ('${m.TimeStamp}', ${m.IsAirConditionerOn},${m.Temperature},'node')`
+    var s = JSON.stringify(message);
+    console.log(s)
+    var m = JSON.parse(s);
 
-    console.log(sql);
-    pool.query(
-      sql,
-      (err, res) => {
+    if (m.TimeStamp) {
+      //  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
+      var sql = `insert into Table_001 VALUES ('${m.TimeStamp}', ${m.IsAirConditionerOn},${m.Temperature},'node')`;
+
+      console.log(sql);
+      pool.query(sql, (err, res) => {
         console.error(err, res);
         //if (pool) pool.end();
-      }
-    );
-  }else{
+      });
+    }
+  } else {
     console.log(`not utf8 ${msg}`);
   }
 }

@@ -28,6 +28,11 @@ namespace DotNetDataGenerator
                 .CreateLogger();
 
             Log.Information("DotNetDataGenerator");
+
+            for(var i=1;i<60;i++){
+                Log.Information("waiting for nifi");
+            }
+
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_WORKLOADURI"));
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_IOTHUBHOSTNAME"));
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_GATEWAYHOSTNAME"));
@@ -101,8 +106,10 @@ namespace DotNetDataGenerator
             var chance = new Chance(42); // random data generator
             var payload = chance.Object<Payload>();
 
-            for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 100; i++)
             {
+                _tempChange = chance.Double(0, 1.5);
+
                 if (_airconActive)
                 {
                     // air con is active - cool down
@@ -123,7 +130,7 @@ namespace DotNetDataGenerator
                 else
                 {
                     // air con OFF increase the heat 
-                    currentTemp = currentTemp + chance.Double(1, _tempChange);
+                    currentTemp = currentTemp + _tempChange;
                     Log.Information($"aircon off. increasing by {_tempChange} Temp: {currentTemp}");
                 }
 
@@ -140,7 +147,6 @@ namespace DotNetDataGenerator
                     using (var pipeMessage = new Message(messageBytes))
                     {
                         await ioTHubModuleClient.SendEventAsync("output1", pipeMessage);
-
                         Log.Information("sent: " + msg);
                     }
                 }
@@ -149,7 +155,7 @@ namespace DotNetDataGenerator
                     Log.Error(ex, "DotNetDataGenerator {0}", payload);
                 }
 
-                Thread.Sleep(TimeSpan.FromSeconds(60));
+                Thread.Sleep(TimeSpan.FromSeconds(10));
                 i++;
             }
         }
