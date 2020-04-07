@@ -7,6 +7,7 @@ import datetime
 import os
 import sys
 import json
+import uuid
 import asyncio
 from six.moves import input
 import threading
@@ -70,12 +71,12 @@ async def main():
 
                 sdata = json.dumps(data)
                 print(sdata)
-                # msg = Message(sdata)
-                # msg.message_id = uuid.uuid4()
+                msg = Message(sdata)
+                msg.message_id = uuid.uuid4()
 
-                #await module_client.send_message_to_output(msg, "output1")
+                await module_client.send_message_to_output(msg, "output1")
                 print("done sending message #" + str(i))
-                time.sleep(60)
+                time.sleep(10)
             except:
                 print("Unexpected error:", sys.exc_info()[0])
                 raise
