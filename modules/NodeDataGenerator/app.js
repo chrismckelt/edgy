@@ -30,18 +30,8 @@ Client.fromEnvironment(Transport, function (err, client) {
         });
 
         // block until nifi ready
-        var waitTill = new Date(new Date().getTime() + 6 * 1000);
-        while (waitTill > new Date()) {
-          var currentdate = new Date();
-          var datetime =
-            currentdate.getHours() +
-            ":" +
-            currentdate.getMinutes() +
-            ":" +
-            currentdate.getSeconds();
-
-          console.log("waiting for nifi " + datetime);
-        }
+        console.log("waiting for nifi", 1000);
+        setTimeout(() => start(client), 1000);
 
         start(client);
       }
@@ -56,7 +46,7 @@ function start(client) {
 
   var interval = setInterval(() => {
     // const eventData =        '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
-    var utc = new Date().getUTCDate();
+    var utc = new Date();
     _tempChange = chance.floating({ min: 0, max: 1.5, fixed: 2 });
 
     if (_airconActive) {
@@ -81,7 +71,7 @@ function start(client) {
     }
 
     const data = {
-      TimeStamp: utc,
+      TimeStamp: "'" + utc.toISOString() + "'",
       Temperature: currentTemp,
       IsAirConditionerOn: _airconActive,
       TagKey: "node",
@@ -93,7 +83,7 @@ function start(client) {
     client.sendOutputEvent(
       "output1",
       outputMsg,
-      printResultFor("Sending " + JSON.stringify(outputMsg))
+      printResultFor("sent " + JSON.stringify(outputMsg))
     );
 
     if (counter >= 100) clearInterval(interval);
@@ -117,14 +107,17 @@ function pipeMessage(client, inputName, msg) {
   client.complete(msg, printResultFor("receiving message from nifi"));
   var message = msg.getBytes().toString("utf8");
   if (inputName === "input1") {
-    
     var payload = JSON.parse(message);
 
     if (payload.TagKey != "node") {
       return;
     }
 
-    if (payload.IsAirConditionerOn == false && payload.Temperature > 25 && payload.TagKey == "node") {
+    if (
+      payload.IsAirConditionerOn == false &&
+      payload.Temperature > 25 &&
+      payload.TagKey == "node"
+    ) {
       console.log("################# ActivateAirCon #################");
       console.log(message);
       _airconActive = true;

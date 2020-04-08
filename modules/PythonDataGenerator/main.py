@@ -72,7 +72,7 @@ async def main():
                     #sdata =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
 
                     sdata = '{"TimeStamp":"AAA","IsAirConditionerOn" : "BBB","Temperature": CCC,"TagKey":"python"}' 
-                    sdata = sdata.replace("AAA", datetime.datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'))
+                    sdata = sdata.replace("AAA", datetime.datetime.utcnow().isoformat())
                     sdata = sdata.replace("BBB", str(aircon_active))
                     sdata = sdata.replace("CCC", str(current_temp))
                     state[1] = current_temp

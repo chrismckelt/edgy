@@ -31,7 +31,7 @@ current_temp = 21
 # data = json.load(sdata)
 # #sdata = '{"TimeStamp":"{dt}","IsAirConditionerOn":"{aircon_active}","Temperature":{current_temp},"TagKey":"python"}'
 
-sdata =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
+data =  '{"TimeStamp":"{dt}","IsAirConditionerOn":{b},"Temperature":{current_temp},"TagKey":"python"}'.format(dt=datetime.utcnow().strftime('%B %d %Y - %H:%M:%S'), b=current_temp, current_temp=current_temp)
 
 
 print(sdata)

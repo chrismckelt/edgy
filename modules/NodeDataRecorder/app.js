@@ -32,7 +32,6 @@ Client.fromEnvironment(Transport, function (err, client) {
 
         // Act on input messages to the module.
         client.on("inputMessage", function (inputName, msg) {
-          console.log(`message received ${JSON.stringify(msg)}`);
           pipeMessage(client, inputName, msg, pool);
         });
       }
@@ -42,33 +41,37 @@ Client.fromEnvironment(Transport, function (err, client) {
 
 // This function just pipes the messages without any change.
 function pipeMessage(client, inputName, msg, pool) {
-  client.complete(msg, printResultFor("Receiving message"));
+  client.complete(msg, printResultFor("message received"));
 
   var message = msg.getBytes().toString("utf8");
+  //console.debug(message);
+  //let data = Buffer.from(JSON.parse(message).data);
+ 
   if (inputName === "input1") {
-    saveToDatabase(pool, message);
+    if (message)
+      saveToDatabase(pool, message);
   }
 }
 
-function saveToDatabase(message) {
-  if (message) {
+function saveToDatabase(pool, message) {
+  var m = JSON.parse(message);
+  //console.debug(m);
+  if (m) {
     //var m = new Message(message);
-    var s = JSON.stringify(message);
-    console.log(s)
-    var m = JSON.parse(s);
-
     if (m.TimeStamp) {
       //  '{"TimeStamp":"2020-02-26T03:38:07.2354044Z","IsAirConditionerOn":1,"Temperature":0.76241135306768648,"TagKey":"node"}';
-      var sql = `insert into Table_001 VALUES ('${m.TimeStamp}', ${m.IsAirConditionerOn},${m.Temperature},'node')`;
+      var aircon = 0;
+      if (m.IsAirConditionerOn) aircon = 1;
+      var sql = `insert into Table_001 VALUES (${m.TimeStamp}, ${aircon},${m.Temperature},'node')`;
 
-      console.log(sql);
+      console.info(sql);
       pool.query(sql, (err, res) => {
         console.error(err, res);
         //if (pool) pool.end();
       });
     }
   } else {
-    console.log(`not utf8 ${msg}`);
+    console.error(`not utf8 ${JSON.stringify(m)}`);
   }
 }
 
