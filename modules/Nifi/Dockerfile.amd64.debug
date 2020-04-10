@@ -10,6 +10,7 @@ RUN unset EdgeHubConnectionString
 WORKDIR /module
 
 COPY local.sh ./
+COPY backup.sh ./
 
 WORKDIR ${NIFI_HOME}
 

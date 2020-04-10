@@ -57,12 +57,16 @@ function start(client) {
           `aircon on. descreasing by ${_tempChange} Temp: ${currentTemp}`
         );
       } else {
-        // fix the tempat 18 if it goes below
+        // fix the temp at 18 if it goes below
         currentTemp = 18;
         _airconActive = false; // turn off
         console.log(`aircon too cold. turning off`);
       }
     } else {
+
+      if (currentTemp > 30){
+        console.warn('OVERHEATING');
+      }
       // air con OFF increase the heat
       currentTemp = currentTemp + _tempChange;
       console.log(
@@ -115,8 +119,7 @@ function pipeMessage(client, inputName, msg) {
 
     if (
       payload.IsAirConditionerOn == false &&
-      payload.Temperature > 25 &&
-      payload.TagKey == "node"
+      payload.Temperature > 25
     ) {
       console.log("################# ActivateAirCon #################");
       console.log(message);

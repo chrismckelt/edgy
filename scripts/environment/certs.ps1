@@ -31,11 +31,8 @@ keytool -import -noprompt -alias iot-edge2 -file /config/local/certs/edge-device
 cd /opt/nifi/nifi-current/bin
 bash ./nifi.sh restart
 
-## COPY BACK   - manual backup first!
-
-#cd /opt/nifi/nifi-current/bin
-#bash ./nifi.sh stop
-
+## Back Up first!
+mkdir /config/local/nifi/
 mkdir /config/local/nifi/conf
 mkdir /config/local/nifi/content_repository
 mkdir /config/local/nifi/database_repository

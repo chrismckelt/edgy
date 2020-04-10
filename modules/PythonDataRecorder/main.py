@@ -39,7 +39,6 @@ async def main():
         # define behavior for receiving an input message on input1
         async def input1_listener(module_client):
           #  ptvsd.break_into_debugger()
-            
             while True:
                 payload = await module_client.receive_message_on_input("input1")  # blocking call
                 print("Message received on input1")
@@ -47,6 +46,9 @@ async def main():
                 print( "    Properties: {}".format(payload.custom_properties))
                 data = json.loads(payload.data)
                 number = 0
+
+                if bool(data["TimeStamp"]):
+                    number = 1
                 
                 print(data["TimeStamp"])
                 """ insert data into table """

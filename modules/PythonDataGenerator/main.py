@@ -66,6 +66,10 @@ async def main():
                             print('aircon too cold. turning off')
                             state[0] = 0;
                     else:        
+
+                        if current_temp > 30:
+                            print('OVERHEATING')
+
                         current_temp = current_temp + temp_change
                         print(f"aircon off. increasing by {temp_change} Temp: {current_temp}")
                     
@@ -96,7 +100,7 @@ async def main():
             while True:
                 input_message = await module_client.receive_message_on_input("input1")  # blocking call
                
-                print("message received from nifi ")
+                print("message received from nifi")
                 print(input_message.data)
                 
                 payload = json.loads(input_message.data)

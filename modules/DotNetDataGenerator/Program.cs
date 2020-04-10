@@ -28,17 +28,17 @@ namespace DotNetDataGenerator
                 .CreateLogger();
 
             Log.Information("DotNetDataGenerator");
-
-            for(var i=1;i<60;i++){
-                Log.Information("waiting for nifi");
-            }
-
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_WORKLOADURI"));
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_IOTHUBHOSTNAME"));
             Log.Information(Environment.GetEnvironmentVariable("IOTEDGE_GATEWAYHOSTNAME"));
             Log.Information(Environment.GetEnvironmentVariable("EdgeHubConnectionString"));
             Log.Information(Environment.GetEnvironmentVariable("IotHubConnectionString"));
             Log.Information(Environment.GetEnvironmentVariable("EdgeModuleCACertificateFile"));
+
+            for(var i=1;i<60;i++){
+                Log.Information("waiting for nifi");
+                Thread.Sleep(1000);
+            }
 
             try
             {
@@ -129,6 +129,9 @@ namespace DotNetDataGenerator
                 }
                 else
                 {
+                    if (currentTemp >  30){
+                        Log.Warning("OVERHEATING");
+                    }
                     // air con OFF increase the heat 
                     currentTemp = currentTemp + _tempChange;
                     Log.Information($"aircon off. increasing by {_tempChange} Temp: {currentTemp}");
@@ -223,8 +226,6 @@ namespace DotNetDataGenerator
         /// </summary>
         static async Task<MessageResponse> NifiMessageReceived(Message message, object userContext)
         {
-            int counterValue = Interlocked.Increment(ref _counter);
-
             var moduleClient = userContext as ModuleClient;
             if (moduleClient == null)
             {
@@ -235,17 +236,16 @@ namespace DotNetDataGenerator
             string messageString = Encoding.UTF8.GetString(messageBytes);
             Payload payload = JsonConvert.DeserializeObject<Payload>(messageString.TrimStart('"').TrimEnd('"').Replace("\\", String.Empty));
 
-            Log.Information($"received:{messageString}");
+            Log.Information($"message received from nifi");
+            Log.Information(messageString);
 
             if (payload.TagKey != "dotnet"){
-                return await Task.FromResult(MessageResponse.None);
+                return await Task.FromResult(MessageResponse.Completed);
             }
 
-            if (payload.IsAirConditionerOn == false && payload.Temperature > 25 && payload.TimeStamp >  DateTime.UtcNow.AddMinutes(-10)) // ignore old events
+            if (payload.IsAirConditionerOn == false && payload.Temperature >  25) 
             { // HOT!
-                Log.Information("########################################");
-                Log.Information($"TURNING ON AIR CON - NIFI MESSAGE RECEIVED");
-                Log.Information("########################################");
+                Log.Information($"################# ActivateAirCon #################");
                 _airconActive = true;
             }
 

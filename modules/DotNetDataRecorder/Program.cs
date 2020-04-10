@@ -134,7 +134,6 @@ namespace DotNetDataRecorder
         /// </summary>
         static async Task<MessageResponse> SaveMessage(Message message, object userContext)
         {
-            int counterValue = Interlocked.Increment(ref _counter);
 
             var moduleClient = userContext as ModuleClient;
             if (moduleClient == null)
@@ -171,21 +170,24 @@ namespace DotNetDataRecorder
             return await Task.FromResult(MessageResponse.Completed);
         }
 
-
         static async Task SaveData(Payload p)
         {
-
             try
             {
                 var connString = "Server=timescaledb;Port=5432;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
 
                 using (var conn = new NpgsqlConnection(connString))
                 {
+                    int aircon = 0;
+                    if (p.IsAirConditionerOn){
+                        aircon = 1;
+                    }
+
+                    string sql = $"insert into Table_001 VALUES ('{p.TimeStamp}',{aircon},{p.Temperature},'{p.TagKey}')";
                     await conn.OpenAsync();
-                    // Insert some data
                     using (var cmd =
                         new NpgsqlCommand(
-                            $"insert into Table_001 VALUES ('{p.TimeStamp}', '{Convert.ToInt16(p.IsAirConditionerOn)}','{p.Temperature}','{p.TagKey}')",
+                            sql,
                             conn))
                     {
                         await cmd.ExecuteNonQueryAsync();
