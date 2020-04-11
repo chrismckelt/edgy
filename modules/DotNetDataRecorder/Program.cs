@@ -19,8 +19,6 @@ namespace DotNetDataRecorder
 {
     class Program
     {
-        static int _counter;
-
         const string DefaultApiVersion = "2018-06-28";
         const string IotEdgedUriVariableName = "IOTEDGE_WORKLOADURI";
         const string IotHubHostnameVariableName = "IOTEDGE_IOTHUBHOSTNAME";
