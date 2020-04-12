@@ -80,14 +80,20 @@ namespace DotNetDataGenerator
             // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
 
-            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only); // setup connection to hubs MQTT broker
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only)
+            {
+                CleanSession = true,
+                // ConnectArrivalTimeout = TimeSpan.FromMinutes(3),
+                // DefaultReceiveTimeout = TimeSpan.FromMinutes(3),
+                // KeepAliveInSeconds = 30,
+                // DeviceReceiveAckTimeout = TimeSpan.FromMinutes(1)
+            }; // setup connection to hubs MQTT broker
             ITransportSettings[] settings = { connectionSettings };
-            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(); // inbuilt SDK magic to connect using environment variables
+            
+            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings); // inbuilt SDK magic to connect using environment variables
 
             try
             {
-                await ioTHubModuleClient.OpenAsync(); // 
-
                 // Create a handler for the direct method calls
                 await ioTHubModuleClient.SetMethodHandlerAsync("ActivateAirCon", ActivateAirCon, ioTHubModuleClient);
                 await ioTHubModuleClient.SetMethodHandlerAsync("SetTempChange", SetTempChange, ioTHubModuleClient);
@@ -137,7 +143,7 @@ namespace DotNetDataGenerator
                     Log.Information($"aircon off. increasing by {_tempChange} Temp: {currentTemp}");
                 }
 
-                payload.Temperature = currentTemp;
+                payload.Temperature = Math.Round(currentTemp,2);
                 payload.IsAirConditionerOn = _airconActive;
                 payload.TagKey = "dotnet";
                 payload.TimeStamp = DateTime.UtcNow; 

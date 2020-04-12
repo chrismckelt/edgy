@@ -30,9 +30,9 @@ async System.Threading.Tasks.Task Main()
 
 	try
 	{
-		//var connString = "Host=localhost:8081;Username=postgres;Password=m5asuFHqBE;Database=postgres";
+		//var connString = "Host=localhost:8081;Username=postgres;Password=LgrQE5gXzm2L;Database=postgres";
 		
-		string connString = "Server=localhost;Port=8081;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
+		string connString = "Server=localhost;Port=8081;Database=postgres;User Id=postgres;Password=LgrQE5gXzm2L;";
 		
 		Payload p = new Payload();
 		p.Temperature = 99;

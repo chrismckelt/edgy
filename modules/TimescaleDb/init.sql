@@ -1,4 +1,4 @@
-create table if not exists table_001
+CREATE TABLE IF NOT EXISTS table_001
 (
    "Timestamp" timestamp with time zone not null,
    IsAirConditionerOn smallint not null,
@@ -6,12 +6,10 @@ create table if not exists table_001
    tagkey varchar not null
 );
  
-alter table table_001 owner to postgres;
- 
+ALTER TABLE table_001 OWNER TO postgres;
+
 SELECT create_hypertable ('table_001', 'Timestamp');
-
-
 -- Grafana access
-CREATE USER grafana WITH PASSWORD 'jw8s0F4' CREATEDB;
+CREATE USER grafana WITH PASSWORD 'LgrQE5gXzm2L' CREATEDB;
 
 CREATE DATABASE grafana OWNER grafana;

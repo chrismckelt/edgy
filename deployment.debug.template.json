@@ -86,7 +86,7 @@
           "PythonDataGenerator": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.PythonDataGenerator.debug}",
@@ -96,7 +96,7 @@
           "PythonDataRecorder": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.PythonDataRecorder.debug}",
@@ -106,7 +106,7 @@
           "NodeDataGenerator": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.NodeDataGenerator.debug}",
@@ -136,7 +136,7 @@
           "NodeDataRecorder": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.NodeDataRecorder.debug}",
@@ -196,7 +196,7 @@
           "DotNetDataRecorder": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.DotNetDataRecorder.debug}",
@@ -253,7 +253,7 @@
           "WebApp": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.WebApp.debug}",

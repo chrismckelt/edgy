@@ -73,6 +73,8 @@ function start(client) {
         `aircon off. increasing by ${_tempChange} Temp: ${currentTemp}`
       );
     }
+    
+    currentTemp = Math.round(currentTemp * 100) / 100;
 
     const data = {
       TimeStamp: "'" + utc.toISOString() + "'",

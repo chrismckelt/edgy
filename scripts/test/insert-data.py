@@ -19,7 +19,7 @@ try:
     # read database configuration
     #params = config()
     # connect to the PostgreSQL database
-    conn = psycopg2.connect(host="localhost",database="postgres", user="postgres", password="m5asuFHqBE",port=8081)
+    conn = psycopg2.connect(host="localhost",database="postgres", user="postgres", password="LgrQE5gXzm2L",port=8081)
     # create a new cursor
     cur = conn.cursor()
     # execute the INSERT statement

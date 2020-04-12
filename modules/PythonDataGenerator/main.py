@@ -78,7 +78,7 @@ async def main():
                     sdata = '{"TimeStamp":"AAA","IsAirConditionerOn" : "BBB","Temperature": CCC,"TagKey":"python"}' 
                     sdata = sdata.replace("AAA", datetime.datetime.utcnow().isoformat())
                     sdata = sdata.replace("BBB", str(aircon_active))
-                    sdata = sdata.replace("CCC", str(current_temp))
+                    sdata = sdata.replace("CCC", str(round(current_temp, 2)))
                     state[1] = current_temp
                     #sdata = json.dumps(data)
                  

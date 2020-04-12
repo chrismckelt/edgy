@@ -1,5 +1,5 @@
 FROM timescale/timescaledb:latest-pg11
 ENV POSTGRES_USER postgres
 ENV POSTGRES_DB postgres
-ENV POSTGRES_PASSWORD m5asuFHqBE
+ENV POSTGRES_PASSWORD LgrQE5gXzm2L
 COPY init.sql /docker-entrypoint-initdb.d/

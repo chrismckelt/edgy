@@ -24,7 +24,7 @@ Client.fromEnvironment(Transport, function (err, client) {
           user: "postgres",
           host: "timescaledb",
           database: "postgres",
-          password: "m5asuFHqBE",
+          password: "LgrQE5gXzm2L",
           port: "5432",
         });
 

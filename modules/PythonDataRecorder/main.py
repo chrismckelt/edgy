@@ -45,19 +45,19 @@ async def main():
                 print( "    Data: <<{}>>".format(payload.data) )
                 print( "    Properties: {}".format(payload.custom_properties))
                 data = json.loads(payload.data)
-                number = 0
+                aircon_active = 0
 
-                if bool(data["TimeStamp"]):
-                    number = 1
+                if bool(data["IsAirConditionerOn"]):
+                    aircon_active = 1
                 
                 print(data["TimeStamp"])
                 """ insert data into table """
-                sql = """insert into Table_001 VALUES ('{TimeStamp}', '{IsAirConditionerOn}','{Temperature}','{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAirConditionerOn=number,Temperature=data["Temperature"],TagKey=data["TagKey"])
+                sql = """insert into Table_001 VALUES ('{TimeStamp}',{IsAirConditionerOn},{Temperature},'{TagKey}')""".format(TimeStamp=data["TimeStamp"],IsAirConditionerOn=aircon_active,Temperature=data["Temperature"],TagKey=data["TagKey"])
                 print(sql)
                 conn = None
                 try:
-                    conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="m5asuFHqBE",port=5432)  #8881
-                    #conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="m5asuFHqBE",port=8081)  #8881
+                    conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="LgrQE5gXzm2L",port=5432)  #8881
+                    #conn = psycopg2.connect(host=HOST,database="postgres", user="postgres", password="LgrQE5gXzm2L",port=8081)  #8881
                     cur = conn.cursor()
                     cur.execute(sql)
                     conn.commit()

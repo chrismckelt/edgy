@@ -5,7 +5,7 @@ ENV GF_DATABASE_TYPE postgres
 ENV GF_DATABASE_HOST timescaledb
 ENV GF_DATABASE_NAME grafana
 ENV GF_DATABASE_USER grafana
-ENV GF_DATABASE_PASSWORD jw8s0F4
+ENV GF_DATABASE_PASSWORD LgrQE5gXzm2L
 COPY ldap.toml /etc/grafana/
 COPY custom.ini /etc/grafana/
 

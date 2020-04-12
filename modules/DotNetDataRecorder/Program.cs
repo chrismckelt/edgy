@@ -94,9 +94,17 @@ namespace DotNetDataRecorder
            // Open a connection to the Edge runtime
             ModuleClient ioTHubModuleClient;
 
-            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only); // setup connection to hubs MQTT broker
+            var connectionSettings = new MqttTransportSettings(TransportType.Mqtt_Tcp_Only)
+            {
+                CleanSession = true,
+                // ConnectArrivalTimeout = TimeSpan.FromMinutes(3),
+                // DefaultReceiveTimeout = TimeSpan.FromMinutes(3),
+                // KeepAliveInSeconds = 30,
+                // DeviceReceiveAckTimeout = TimeSpan.FromMinutes(1)
+            }; // setup connection to hubs MQTT broker
             ITransportSettings[] settings = { connectionSettings };
-            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(); // inbuilt SDK magic to connect using environment variables
+            
+            ioTHubModuleClient = await ModuleClient.CreateFromEnvironmentAsync(settings); // inbuilt SDK magic to connect using environment variables
 
             try
             {
@@ -172,16 +180,11 @@ namespace DotNetDataRecorder
         {
             try
             {
-                var connString = "Server=timescaledb;Port=5432;Database=postgres;User Id=postgres;Password=m5asuFHqBE;";
+                var connString = "Server=timescaledb;Port=5432;Database=postgres;User Id=postgres;Password=LgrQE5gXzm2L;";
 
                 using (var conn = new NpgsqlConnection(connString))
                 {
-                    int aircon = 0;
-                    if (p.IsAirConditionerOn){
-                        aircon = 1;
-                    }
-
-                    string sql = $"insert into Table_001 VALUES ('{p.TimeStamp}',{aircon},{p.Temperature},'{p.TagKey}')";
+                    string sql = $"insert into Table_001 VALUES ('{p.TimeStamp}',{Convert.ToInt16(p.IsAirConditionerOn)},{p.Temperature},'{p.TagKey}')";
                     await conn.OpenAsync();
                     using (var cmd =
                         new NpgsqlCommand(
