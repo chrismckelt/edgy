@@ -351,3 +351,4 @@ config/deployment.prod.json
 scripts/dump.txt
 /*.jar
 /config
+/*.jar

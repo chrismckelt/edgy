@@ -1,4 +1,5 @@
 FROM grafana/grafana:latest
+# login with admin and below password to web interface
 ENV GF_SECURITY_ADMIN_PASSWORD nb5PoBTg9B2iQ1OH4dMTii4fDVH2bIsVbOx4HA5U
 #ENV GF_AUTH_LDAP_ENABLED=true
 ENV GF_DATABASE_TYPE postgres

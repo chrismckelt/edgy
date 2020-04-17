@@ -1,0 +1,192 @@
+{
+  "modulesContent": {
+    "$edgeAgent": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "runtime": {
+          "type": "docker",
+          "settings": {
+            "minDockerVersion": "v1.25",
+            "loggingOptions": "",
+            "registryCredentials": {
+              "${CONTAINER_REGISTRY_USERNAME}": {
+                "username": "${CONTAINER_REGISTRY_USERNAME}",
+                "password": "${CONTAINER_REGISTRY_PASSWORD}",
+                "address": "${CONTAINER_REGISTRY_SERVER}"
+              },
+              "docker": {
+                "address": "docker.io",
+                "username": "${CONTAINER_DOCKER_USERNAME}",
+                "password": "${CONTAINER_DOCKER_PASSWORD}"
+              }
+            }
+          }
+        },
+        "systemModules": {
+          "edgeAgent": {
+            "type": "docker",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-agent:1.0.5",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ]
+                }
+              }
+            }
+          },
+          "edgeHub": {
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "mcr.microsoft.com/azureiotedge-hub:1.0",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "PortBindings": {
+                    "5671/tcp": [{
+                      "HostPort": "5671"
+                    }],
+                    "8883/tcp": [{
+                      "HostPort": "8883"
+                    }],
+                    "443/tcp": [{
+                      "HostPort": "443"
+                    }]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "modules": {
+          "Grafana": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.Grafana.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "ExposedPorts": "3000/tcp",
+                  "PortBindings": {
+                    "3000/tcp": [
+                      {
+                        "HostPort": "8082"
+                      }
+                    ]
+                  },
+                  "Link": "TimescaleDB"
+                }
+              }
+            }
+          },
+          "TimescaleDB": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${MODULES.TimescaleDb.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "ExposedPorts": "5432/tcp",
+                  "PortBindings": {
+                    "5432/tcp": [{
+                      "HostPort": "8081"
+                    }]
+                  }
+                }
+              }
+            }
+          },
+          "DotNetDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.DotNetDataGenerator.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8085/tcp",
+                  "PortBindings": {
+                    "443/tcp": [{
+                      "HostPort": "8085"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "DotNetDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "stopped",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.DotNetDataRecorder.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ]
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          }
+        }
+      }
+    },
+    "$edgeHub": {
+      "properties.desired": {
+        "schemaVersion": "1.0",
+        "routes": {
+          "AllToUpstream": "FROM /messages/modules/* INTO $upstream",
+
+          "DotNetDataGeneratorToDataRecorder": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/DotNetDataRecorder/inputs/input1\")",
+          "PythonDataGeneratorToDataRecorder": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/PythonDataRecorder/inputs/input1\")",
+          "NodeDataGeneratorToDataRecorder": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/NodeDataRecorder/inputs/input1\")",
+          
+          "DotNetToWebApp": "FROM /messages/modules/DotNetDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "PythonToWebApp": "FROM /messages/modules/PythonDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          "NodeToWebApp": "FROM /messages/modules/NodeDataGenerator/outputs/* INTO BrokeredEndpoint(\"/modules/WebApp/inputs/input1\")",
+          
+          "AllToNifi": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/Nifi/inputs/input1\")",
+
+          "NifiTDotNetDataGenerator": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/DotNetDataGenerator/inputs/input1\")",
+          "NifiToNodeDataGenerator": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/NodeDataGenerator/inputs/input1\")",
+          "PythonToNodeDataGenerator": "FROM /messages/modules/* INTO BrokeredEndpoint(\"/modules/PythonDataGenerator/inputs/input1\")"
+
+        },
+        "storeAndForwardConfiguration": {
+          "timeToLiveSecs": 7200
+        }
+      }
+    }
+  }
+}
