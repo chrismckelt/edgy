@@ -141,6 +141,13 @@ namespace DotNetDataGenerator
                     // air con OFF increase the heat 
                     currentTemp = currentTemp + _tempChange;
                     Log.Information($"aircon off. increasing by {_tempChange} Temp: {currentTemp}");
+
+                    if (currentTemp > 30){
+                        _airconActive = true;
+                    }else{
+                        _airconActive = false;
+                    }
+
                 }
 
                 payload.Temperature = Math.Round(currentTemp,2);

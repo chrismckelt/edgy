@@ -221,7 +221,7 @@
             "version": "1.0",
             "type": "docker",
             "status": "running",
-            "restartPolicy": "never",
+            "restartPolicy": "always",
             "settings": {
               "image": "${MODULES.Nifi.debug}",
               "createOptions": {
@@ -256,7 +256,7 @@
             "status": "running",
             "restartPolicy": "always",
             "settings": {
-              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/grafana:latest",
+              "image": "${MODULES.Grafana.debug}",
               "createOptions": "{\"HostConfig\":{\"ExposedPorts\":\"3000/tcp\",\"PortBindings\":{\"3000/tcp\":[{\"HostPort\":\"8082\"}]},\"Link\":\"timescaledb\"}}"
             }
           },

@@ -64,28 +64,6 @@
           }
         },
         "modules": {
-          "Grafana": {
-            "version": "1.0",
-            "type": "docker",
-            "status": "running",
-            "restartPolicy": "always",
-            "settings": {
-              "image": "${MODULES.Grafana.debug}",
-              "createOptions": {
-                "HostConfig": {
-                  "ExposedPorts": "3000/tcp",
-                  "PortBindings": {
-                    "3000/tcp": [
-                      {
-                        "HostPort": "8082"
-                      }
-                    ]
-                  },
-                  "Link": "TimescaleDB"
-                }
-              }
-            }
-          },
           "TimescaleDB": {
             "version": "1.0",
             "type": "docker",
@@ -102,6 +80,86 @@
                     }]
                   }
                 }
+              }
+            }
+          },
+          "PythonDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.PythonDataGenerator.debug}",
+              "createOptions": {}
+            }
+          },
+          "PythonDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.PythonDataRecorder.debug}",
+              "createOptions": {}
+            }
+          },
+          "NodeDataGenerator": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.NodeDataGenerator.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8086/tcp",
+                  "PortBindings": {
+                    "8086/tcp": [{
+                      "HostPort": "8086"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "NodeDataRecorder": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.NodeDataRecorder.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8087/tcp",
+                  "PortBindings": {
+                    "8087/tcp": [{
+                      "HostPort": "8087"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME} "
               }
             }
           },
@@ -138,7 +196,7 @@
           "DotNetDataRecorder": {
             "version": "1.0",
             "type": "docker",
-            "status": "stopped",
+            "status": "running",
             "restartPolicy": "never",
             "settings": {
               "image": "${MODULES.DotNetDataRecorder.debug}",
@@ -156,6 +214,75 @@
               },
               "LOCAL_STORAGE_ACCOUNT_NAME": {
                 "value": "${LOCAL_ACCOUNT_NAME} "
+              }
+            }
+          },
+          "Nifi": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.Nifi.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8080/tcp",
+                  "PortBindings": {
+                    "8080/tcp": [{
+                      "HostPort": "8080"
+                    }]
+                  }
+                }
+              }
+            },
+            "env": {
+              "LOCAL_STORAGE_ACCOUNT_KEY": {
+                "value": "${LOCAL_ACCOUNT_KEY}"
+              },
+              "LOCAL_STORAGE_ACCOUNT_NAME": {
+                "value": "${LOCAL_ACCOUNT_NAME}"
+              },
+              "NIFI_WEB_HTTP_PORT": {
+                "value": "8080"
+              }
+            }
+          },
+          "Grafana": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "always",
+            "settings": {
+              "image": "${LOCAL_ACCOUNT_NAME}.azurecr.io/grafana:latest",
+              "createOptions": "{\"HostConfig\":{\"ExposedPorts\":\"3000/tcp\",\"PortBindings\":{\"3000/tcp\":[{\"HostPort\":\"8082\"}]},\"Link\":\"timescaledb\"}}"
+            }
+          },
+          "WebApp": {
+            "version": "1.0",
+            "type": "docker",
+            "status": "running",
+            "restartPolicy": "never",
+            "settings": {
+              "image": "${MODULES.WebApp.debug}",
+              "createOptions": {
+                "HostConfig": {
+                  "Binds": [
+                    "c:/config:/config"
+                  ],
+                  "ExposedPorts": "8089/tcp",
+                  "Env": [
+                    "LOCAL_STORAGE_ACCOUNT_KEY=${LOCAL_ACCOUNT_KEY}",
+                    "LOCAL_STORAGE_ACCOUNT_NAME=${LOCAL_ACCOUNT_NAME}"
+                  ],
+                  "PortBindings": {
+                    "8089/tcp": [{
+                      "HostPort": "8089"
+                    }]
+                  }
+                }
               }
             }
           }
